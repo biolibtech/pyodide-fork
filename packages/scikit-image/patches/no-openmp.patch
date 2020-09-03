@@ -16,3 +16,38 @@ index 19331e4d0..06fb24830 100755
  
              cc = self.compiler
              fname = 'test.c'
+
+diff --git a/skimage/restoration/_unwrap_2d.pyx b/skimage/restoration/_unwrap_2d.pyx
+index ad0dfa2..a201541 100644
+--- a/skimage/restoration/_unwrap_2d.pyx
++++ b/skimage/restoration/_unwrap_2d.pyx
+@@ -3,7 +3,7 @@
+ # cython: nonecheck=False
+ # cython: wraparound=False
+ 
+-cdef extern from *:
++cdef extern from "biolibtest.h":
+     void unwrap2D(double* wrapped_image,
+                   double* unwrapped_image,
+                   unsigned char* input_mask,
+diff --git a/skimage/restoration/biolibtest.h b/skimage/restoration/biolibtest.h
+new file mode 100644
+index 0000000..eba3dd3
+--- /dev/null
++++ b/skimage/restoration/biolibtest.h
+@@ -0,0 +1,13 @@
++//
++// Created by biolib on 9/2/20.
++//
++
++#ifndef SCIKIT_IMAGE_0_17_2_TEST_H
++#define SCIKIT_IMAGE_0_17_2_TEST_H
++
++#endif //SCIKIT_IMAGE_0_17_2_TEST_H
++
++void unwrap2D(double *wrapped_image, double *UnwrappedImage,
++              unsigned char *input_mask, int image_width, int image_height,
++              int wrap_around_x, int wrap_around_y,
++              char use_seed, unsigned int seed);
+
+
