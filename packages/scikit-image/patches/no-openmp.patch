@@ -26,15 +26,15 @@ index ad0dfa2..a201541 100644
  # cython: wraparound=False
  
 -cdef extern from *:
-+cdef extern from "biolibtest.h":
++cdef extern from "unwrap_2d_patch.h":
      void unwrap2D(double* wrapped_image,
                    double* unwrapped_image,
                    unsigned char* input_mask,
-diff --git a/skimage/restoration/biolibtest.h b/skimage/restoration/biolibtest.h
+diff --git a/skimage/restoration/unwrap_2d_patch.h b/skimage/restoration/unwrap_2d_patch.h
 new file mode 100644
 index 0000000..eba3dd3
 --- /dev/null
-+++ b/skimage/restoration/biolibtest.h
++++ b/skimage/restoration/unwrap_2d_patch.h
 @@ -0,0 +1,13 @@
 +//
 +// Created by biolib on 9/2/20.
