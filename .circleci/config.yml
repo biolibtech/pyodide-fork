@@ -217,7 +217,6 @@ workflows:
             - build
       - deploy-release:
           requires:
-            - test-firefox
             - test-python
           filters:
             branches:
@@ -226,7 +225,6 @@ workflows:
               only: /^\d+\.\d+\.\d+$/
       - deploy-s3:
           requires:
-            - test-firefox
             - test-python
           filters:
             branches:
