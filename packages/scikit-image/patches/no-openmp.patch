@@ -60,6 +60,26 @@ index eac50e7..210d9a9 100644
 
 -cdef extern from *:
 +cdef extern from "unwrap_3d_patch.h":
-     void unwrap3D(double* wrapped_volume,
+   void unwrap3D(double* wrapped_volume,
                  double* unwrapped_volume,
                  unsigned char* input_mask,
+
+diff --git a/skimage/restoration/unwrap_3d_patch.h b/skimage/restoration/unwrap_3d_patch.h
+new file mode 100644
+index 0000000..345d601
+--- /dev/null
++++ b/skimage/restoration/unwrap_3d_patch.h
+@@ -0,0 +1,12 @@
++//
++// Created by biolib on 9/3/20.
++//
++
++#ifndef SCIKIT_IMAGE_0_17_2_ADAD_H
++#define SCIKIT_IMAGE_0_17_2_ADAD_H
++
++#endif //SCIKIT_IMAGE_0_17_2_ADAD_H
++void unwrap3D(double *wrapped_volume, double *unwrapped_volume,
++              unsigned char *input_mask, int volume_width, int volume_height,
++              int volume_depth, int wrap_around_x, int wrap_around_y,
++              int wrap_around_z, char use_seed, unsigned int seed);
+
