@@ -1,0 +1,9 @@
+package:
+  name: seaborn
+  version: 0.10.1
+source:
+  sha256: 2d1a0c9d6bd1bc3cadb0364b8f06540f51322a670cf8438d0fde1c1c7317adc0
+  url: https://files.pythonhosted.org/packages/df/0e/817bea5f24e32cb014bf984f443bac54ab6c90ffc1ba0ca442065a7266b8/seaborn-0.10.1.tar.gz
+test:
+  imports:
+  - seaborn
