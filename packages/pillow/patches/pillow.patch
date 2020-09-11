@@ -1,5 +1,5 @@
 diff --git a/setup.py b/setup.py
-index b7982a5..0e4d3d7 100755
+index b7982a5..be14ff2 100755
 --- a/setup.py
 +++ b/setup.py
 @@ -722,9 +722,6 @@ class pil_build_ext(build_ext):
@@ -12,7 +12,7 @@ index b7982a5..0e4d3d7 100755
          if sys.platform == "win32":
              libs.extend(["kernel32", "user32", "gdi32"])
          if struct.unpack("h", b"\0\1")[0] == 1:
-@@ -756,18 +753,6 @@ class pil_build_ext(build_ext):
+@@ -756,33 +753,6 @@ class pil_build_ext(build_ext):
                  )
              )
 
@@ -28,9 +28,24 @@ index b7982a5..0e4d3d7 100755
 -                )
 -            )
 -
-         if feature.webp:
-             libs = [feature.webp]
-             defs = []
+-        if feature.webp:
+-            libs = [feature.webp]
+-            defs = []
+-
+-            if feature.webpmux:
+-                defs.append(("HAVE_WEBPMUX", None))
+-                libs.append(feature.webpmux)
+-                libs.append(feature.webpmux.replace("pmux", "pdemux"))
+-
+-            exts.append(
+-                Extension(
+-                    "PIL._webp", ["src/_webp.c"], libraries=libs, define_macros=defs
+-                )
+-            )
+-
+         tk_libs = ["psapi"] if sys.platform == "win32" else []
+         exts.append(
+             Extension(
 diff --git a/src/_imaging.c b/src/_imaging.c
 index 1ed5e8a..ad63914 100644
 --- a/src/_imaging.c
