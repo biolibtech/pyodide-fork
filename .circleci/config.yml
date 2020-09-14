@@ -226,6 +226,4 @@ workflows:
       - deploy-s3:
           requires:
             - test-python
-          filters:
-            branches:
-              only: master
+            - build
