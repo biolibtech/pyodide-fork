@@ -1,8 +1,19 @@
 diff --git a/setup.py b/setup.py
-index b7982a5..cfeb126 100755
+index b7982a5..73eb2d5 100755
 --- a/setup.py
 +++ b/setup.py
-@@ -719,12 +719,6 @@ class pil_build_ext(build_ext):
+@@ -708,23 +708,12 @@ class pil_build_ext(build_ext):
+         if feature.jpeg:
+             libs.append(feature.jpeg)
+             defs.append(("HAVE_LIBJPEG", None))
+-        if feature.jpeg2000:
+-            libs.append(feature.jpeg2000)
+-            defs.append(("HAVE_OPENJPEG", None))
+-            if sys.platform == "win32" and not PLATFORM_MINGW:
+-                defs.append(("OPJ_STATIC", None))
+         if feature.zlib:
+             libs.append(feature.zlib)
+             defs.append(("HAVE_LIBZ", None))
          if feature.imagequant:
              libs.append(feature.imagequant)
              defs.append(("HAVE_LIBIMAGEQUANT", None))
@@ -15,7 +26,7 @@ index b7982a5..cfeb126 100755
          if sys.platform == "win32":
              libs.extend(["kernel32", "user32", "gdi32"])
          if struct.unpack("h", b"\0\1")[0] == 1:
-@@ -756,33 +750,6 @@ class pil_build_ext(build_ext):
+@@ -756,33 +745,6 @@ class pil_build_ext(build_ext):
                  )
              )
 
