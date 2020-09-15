@@ -10,4 +10,4 @@ build:
   cflags: -s USE_FREETYPE=1 -s USE_LIBJPEG -s USE_ZLIB
 test:
   imports:
-  - pillow
+  - PIL

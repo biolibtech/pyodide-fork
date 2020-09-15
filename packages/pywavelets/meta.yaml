@@ -9,4 +9,4 @@ requirements:
     - numpy
 test:
   imports:
-  - pywavelets
+  - pywt
