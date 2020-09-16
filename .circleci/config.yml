@@ -193,8 +193,6 @@ workflows:
             tags:
               only: /.*/
       - build-test-minimal:
-          requires:
-            - lint
       - test-chrome:
           requires:
             - build
