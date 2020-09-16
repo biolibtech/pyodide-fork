@@ -181,8 +181,8 @@ jobs:
           name: Deploy to S3
           command: |
             # aws s3 rm --recursive "s3://biolib-public-assets/pyodide-dev/dev/full/"
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v${CIRCLE_TAG}/full/" --exclude '*.data' --cache-control 'max-age=3600, public'  # 1 hour
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v${CIRCLE_TAG}/full/" --exclude '*' --include '*.data' --cache-control 'max-age=3600, public'  --content-type 'application/wasm' # 1 hour
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v0.0.${CIRCLE_BUILD_NUM}/" --exclude '*.data' --cache-control 'max-age=3600, public'  # 1 hour
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v0.0.${CIRCLE_BUILD_NUM}/" --exclude '*' --include '*.data' --cache-control 'max-age=3600, public'  --content-type 'application/wasm' # 1 hour
 
 workflows:
   version: 2
