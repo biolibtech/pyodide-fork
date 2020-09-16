@@ -23,7 +23,7 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-emsdk-{{ checksum "emsdk/Makefile" }}-v20200606-
+          - v1-emsdk-{{ checksum "emsdk/Makefile" }}-v30200606-
 
       - run:
           name: build
