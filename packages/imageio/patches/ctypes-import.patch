@@ -1,0 +1,164 @@
+diff --git a/imageio/core/findlib.py b/imageio/core/findlib.py
+index 1ae11bc..f0d3b05 100644
+--- a/imageio/core/findlib.py
++++ b/imageio/core/findlib.py
+@@ -7,7 +7,7 @@
+
+ import os
+ import sys
+-import ctypes
++#import ctypes
+
+
+ LOCALDIR = os.path.abspath(os.path.dirname(__file__))
+@@ -122,6 +122,7 @@ def load_lib(exact_lib_names, lib_names, lib_dirs=None):
+     lib_paths = exact_lib_names + lib_paths
+
+     # Select loader
++    import ctypes
+     if sys.platform.startswith("win"):
+         loader = ctypes.windll
+     else:
+diff --git a/imageio/plugins/_freeimage.py b/imageio/plugins/_freeimage.py
+index dc1186c..fa8fdb8 100644
+--- a/imageio/plugins/_freeimage.py
++++ b/imageio/plugins/_freeimage.py
+@@ -14,7 +14,7 @@ types.
+
+ import os
+ import sys
+-import ctypes
++#import ctypes
+ import threading
+ import logging
+ import numpy
+@@ -343,7 +343,7 @@ class Freeimage(object):
+         lib.FreeImage_GetPalette()
+
+     """
+-
++    import ctypes
+     _API = {
+         # All we're doing here is telling ctypes that some of the
+         # FreeImage functions return pointers instead of integers. (On
+@@ -407,6 +407,8 @@ class Freeimage(object):
+
+     def __init__(self):
+
++        import ctypes
++
+         # Initialize freeimage lib as None
+         self._lib = None
+
+@@ -580,6 +582,7 @@ class Freeimage(object):
+             # do not have a header that allows reading the format from
+             # the file.
+             if mode == "r":
++                import ctypes
+                 if bb is not None:
+                     fimemory = lib.FreeImage_OpenMemory(ctypes.c_char_p(bb), len(bb))
+                     ftype = lib.FreeImage_GetFileTypeFromMemory(
+@@ -663,6 +666,7 @@ class FIBaseBitmap(object):
+
+         # Prepare
+         metadata = Dict()
++        import ctypes
+         tag = ctypes.c_void_p()
+
+         with self._fi as lib:
+@@ -749,6 +753,7 @@ class FIBaseBitmap(object):
+
+                     # Create new tag
+                     tag = lib.FreeImage_CreateTag()
++                    import ctypes
+                     tag = ctypes.c_void_p(tag)
+
+                     try:
+@@ -825,6 +830,7 @@ class FIBitmap(FIBaseBitmap):
+         with self._fi as lib:
+             bpp = 8 * dtype.itemsize * n_channels
+             bitmap = lib.FreeImage_AllocateT(fi_type, c, r, bpp, 0, 0, 0)
++            import ctypes
+             bitmap = ctypes.c_void_p(bitmap)
+
+             # Check and store
+@@ -842,6 +848,7 @@ class FIBitmap(FIBaseBitmap):
+         with self._fi as lib:
+             # Create bitmap
+             bitmap = lib.FreeImage_Load(self._ftype, efn(filename), self._flags)
++            import ctypes
+             bitmap = ctypes.c_void_p(bitmap)
+
+             # Check and store
+@@ -1018,6 +1025,7 @@ class FIBitmap(FIBaseBitmap):
+         if len(shape) == 2 and dtype.type == numpy.uint8:
+             with self._fi as lib:
+                 palette = lib.FreeImage_GetPalette(self._bitmap)
++            import ctypes
+             palette = ctypes.c_void_p(palette)
+             if not palette:
+                 raise RuntimeError("Could not get image palette")
+@@ -1051,6 +1059,7 @@ class FIBitmap(FIBaseBitmap):
+             strides = (itemsize, pitch)
+
+         # Create numpy array and return
++        import ctypes
+         data = (ctypes.c_char * byte_size).from_address(bits)
+         try:
+             self._need_finish = False
+@@ -1102,6 +1111,7 @@ class FIBitmap(FIBaseBitmap):
+                 array2[:, : array.shape[-2], i] = array[i, :, :].T
+         # copy data
+         data_ptr = array2.__array_interface__["data"][0]
++        import ctypes
+         ctypes.memmove(bits, data_ptr, array2.nbytes)
+         del array2
+
+@@ -1128,6 +1138,7 @@ class FIBitmap(FIBaseBitmap):
+                 # Examine the palette. If it is grayscale, we return as such
+                 if has_pallette == 256:
+                     palette = lib.FreeImage_GetPalette(bitmap)
++                    import ctypes
+                     palette = ctypes.c_void_p(palette)
+                     p = (ctypes.c_uint8 * (256 * 4)).from_address(palette.value)
+                     p = numpy.frombuffer(p, numpy.uint32).copy()
+@@ -1149,6 +1160,7 @@ class FIBitmap(FIBaseBitmap):
+                 # raise ValueError('Cannot convert %d BPP bitmap' % bpp)
+                 # Convert bitmap and call this method again
+                 newbitmap = lib.FreeImage_ConvertTo32Bits(bitmap)
++                import ctypes
+                 newbitmap = ctypes.c_void_p(newbitmap)
+                 self._set_bitmap(newbitmap)
+                 return self._get_type_and_shape()
+@@ -1168,6 +1180,7 @@ class FIBitmap(FIBaseBitmap):
+             bitmap = lib.FreeImage_ColorQuantizeEx(
+                 self._bitmap, quantizer, palettesize, 0, None
+             )
++            import ctypes
+             bitmap = ctypes.c_void_p(bitmap)
+
+             # Check and return
+@@ -1228,6 +1241,7 @@ class FIMultipageBitmap(FIBaseBitmap):
+                 keep_cache_in_memory,
+                 self._flags,
+             )
++            import ctypes
+             multibitmap = ctypes.c_void_p(multibitmap)
+
+             # Check
+@@ -1278,6 +1292,7 @@ class FIMultipageBitmap(FIBaseBitmap):
+                 keep_cache_in_memory,
+                 0,
+             )
++            import ctypes
+             multibitmap = ctypes.c_void_p(multibitmap)
+
+             # Check
+@@ -1301,6 +1316,7 @@ class FIMultipageBitmap(FIBaseBitmap):
+
+             # Create low-level bitmap in freeimage
+             bitmap = lib.FreeImage_LockPage(self._bitmap, index)
++            import ctypes
+             bitmap = ctypes.c_void_p(bitmap)
+             if not bitmap:  # pragma: no cover
+                 raise ValueError(
