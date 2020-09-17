@@ -1,5 +1,5 @@
 package:
-  name: pillow
+  name: Pillow
   version: 7.2.0
 source:
   patches:
