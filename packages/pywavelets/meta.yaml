@@ -1,5 +1,5 @@
 package:
-  name: pywavelets
+  name: PyWavelets
   version: 1.1.1
 source:
   sha256: 1a64b40f6acb4ffbaccce0545d7fc641744f95351f62e4c6aaa40549326008c9
