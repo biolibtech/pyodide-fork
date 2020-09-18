@@ -162,8 +162,8 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v${CIRCLE_TAG}/full/" --exclude '*.data' --cache-control 'max-age=30758400, immutable, public'  # 1 year
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v${CIRCLE_TAG}/full/" --exclude '*' --include '*.data' --cache-control 'max-age=30758400, immutable, public'  --content-type 'application/wasm' # 1 year
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/${CIRCLE_TAG}-biolib/" --exclude '*.data' --cache-control 'max-age=30758400, immutable, public' --acl public-read # 1 year
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/${CIRCLE_TAG}-biolib/" --exclude '*' --include '*.data' --cache-control 'max-age=30758400, immutable, public'  --content-type 'application/wasm' --acl public-read # 1 year
             # update 301 redirect for the /latest/* route.
             aws s3api put-bucket-website --cli-input-json file://.circleci/s3-website-config.json
 
@@ -183,9 +183,8 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            # aws s3 rm --recursive "s3://biolib-public-assets/pyodide-dev/dev/full/"
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v0.0.${CIRCLE_BUILD_NUM}/" --exclude '*.data' --cache-control 'max-age=3600, public'  # 1 hour
-            aws s3 sync build/ "s3://biolib-public-assets/pyodide-dev/v0.0.${CIRCLE_BUILD_NUM}/" --exclude '*' --include '*.data' --cache-control 'max-age=3600, public'  --content-type 'application/wasm' # 1 hour
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide/0.0.${CIRCLE_BUILD_NUM}-biolib/" --exclude '*.data' --cache-control 'max-age=3600, public'  --acl public-read # 1 hour
+            aws s3 sync build/ "s3://biolib-public-assets/pyodide/0.0.${CIRCLE_BUILD_NUM}-biolib/" --exclude '*' --include '*.data' --cache-control 'max-age=3600, public'  --content-type 'application/wasm' --acl public-read # 1 hour
 
 workflows:
   version: 2
