@@ -1,30 +1,24 @@
-commit d6740caa7400105a578ace74f8c25bbb3434178c
-Author: Roman Yurchak <rth.yurchak@pm.me>
-Date:   Wed Oct 10 14:47:12 2018 +0200
-
-    Disable scipy.stats.mvn
-
 diff --git a/scipy/stats/kde.py b/scipy/stats/kde.py
-index 7c702a038..8b0ab0254 100644
+index ed082e3..7ec30a8 100755
 --- a/scipy/stats/kde.py
 +++ b/scipy/stats/kde.py
-@@ -32,7 +32,10 @@ import numpy as np
- from numpy.random import randint, multivariate_normal
- 
+@@ -31,7 +31,10 @@ from numpy import (asarray, atleast_2d, reshape, zeros, newaxis, dot, exp, pi,
+ import numpy as np
+
  # Local imports.
 -from . import mvn
 +try:
 +    from . import mvn
 +except ImportError:
 +    mvn = None
- 
- 
- __all__ = ['gaussian_kde']
+ from ._stats import gaussian_kernel_estimate
+
+
 diff --git a/scipy/stats/setup.py b/scipy/stats/setup.py
-index f1a02df4e..7366ec12d 100755
+index 94dc721..abbb1f0 100755
 --- a/scipy/stats/setup.py
 +++ b/scipy/stats/setup.py
-@@ -32,9 +32,9 @@ def configuration(parent_package='',top_path=None):
+@@ -24,9 +24,9 @@ def configuration(parent_package='',top_path=None):
      )
  
      # add mvn module

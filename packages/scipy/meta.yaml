@@ -1,6 +1,6 @@
 package:
   name: scipy
-  version: 0.17.1
+  version: 1.5.2
 
 source:
   # We can't use the version from PyPi as it includes Cythonized files
@@ -8,8 +8,8 @@ source:
   # This requires,
   #    pip install Cython Tempita
   # on the host for the build
-  url: https://github.com/scipy/scipy/archive/v0.17.1.tar.gz
-  sha256: bf22383d9e2526ffdc53a6c7d3d66dab45a86291ed35d8e281bd1a5d2c34187b
+  url: https://files.pythonhosted.org/packages/53/10/776750d57ade26522478a92a2e14035868624a6a62f4157b0cc5abd4a980/scipy-1.5.2.tar.gz
+  sha256: 066c513d90eb3fd7567a9e150828d39111ebd88d3e924cdfc9f8ce19ab6f90c9
 
   patches:
     # these patches can be found as commits in
