@@ -1,0 +1,431 @@
+diff --git a/scipy/integrate/_ode.py b/scipy/integrate/_ode.py
+index 3094650..3fb6269 100755
+--- a/scipy/integrate/_ode.py
++++ b/scipy/integrate/_ode.py
+@@ -87,9 +87,19 @@ import warnings
+
+ from numpy import asarray, array, zeros, isscalar, real, imag, vstack
+
+-from . import vode as _vode
+-from . import _dop
+-from . import lsoda as _lsoda
++try:
++    from . import vode as _vode
++except ImportError:
++    _vode = None
++try:
++    from . import _dop
++except ImportError:
++    _dop = None
++
++try:
++    from . import lsoda as _lsoda
++except ImportError:
++    _lsoda = None
+
+
+ _dop_int_dtype = _dop.types.intvar.dtype
+diff --git a/scipy/integrate/odepack.py b/scipy/integrate/odepack.py
+index 8119d2a..9a72505 100755
+--- a/scipy/integrate/odepack.py
++++ b/scipy/integrate/odepack.py
+@@ -3,7 +3,8 @@
+ __all__ = ['odeint']
+
+ import numpy as np
+-from . import _odepack
++# from . import _odepack
++_odepack = None
+ from copy import copy
+ import warnings
+
+diff --git a/scipy/integrate/setup.py b/scipy/integrate/setup.py
+index 11ce3d1..ebcfc5f 100755
+--- a/scipy/integrate/setup.py
++++ b/scipy/integrate/setup.py
+@@ -56,37 +56,37 @@ def configuration(parent_package='',top_path=None):
+     # odepack/lsoda-odeint
+     cfg = combine_dict(lapack_opt, numpy_nodepr_api,
+                        libraries=['lsoda', 'mach'])
+-    config.add_extension('_odepack',
+-                         sources=['_odepackmodule.c'],
+-                         depends=(lsoda_src + mach_src),
+-                         **cfg)
++    #config.add_extension('_odepack',
++    #                     sources=['_odepackmodule.c'],
++    #                     depends=(lsoda_src + mach_src),
++    #                     **cfg)
+
+     # vode
+     cfg = combine_dict(lapack_opt,
+                        libraries=['vode'])
+-    ext = config.add_extension('vode',
+-                               sources=['vode.pyf'],
+-                               depends=vode_src,
+-                               f2py_options=f2py_options,
+-                               **cfg)
++    #ext = config.add_extension('vode',
++    #                           sources=['vode.pyf'],
++    #                           depends=vode_src,
++    #                           f2py_options=f2py_options,
++    #                           **cfg)
+     ext._pre_build_hook = pre_build_hook
+
+     # lsoda
+     cfg = combine_dict(lapack_opt,
+                        libraries=['lsoda', 'mach'])
+-    ext = config.add_extension('lsoda',
+-                               sources=['lsoda.pyf'],
+-                               depends=(lsoda_src + mach_src),
+-                               f2py_options=f2py_options,
+-                               **cfg)
++    #ext = config.add_extension('lsoda',
++    #                           sources=['lsoda.pyf'],
++    #                           depends=(lsoda_src + mach_src),
++    #                           f2py_options=f2py_options,
++    #                           **cfg)
+     ext._pre_build_hook = pre_build_hook
+
+     # dop
+-    ext = config.add_extension('_dop',
+-                               sources=['dop.pyf'],
+-                               libraries=['dop'],
+-                               depends=dop_src,
+-                               f2py_options=f2py_options)
++    #ext = config.add_extension('_dop',
++    #                           sources=['dop.pyf'],
++    #                           libraries=['dop'],
++    #                           depends=dop_src,
++    #                           f2py_options=f2py_options)
+     ext._pre_build_hook = pre_build_hook
+
+     config.add_extension('_test_multivariate',
+@@ -95,11 +95,11 @@ def configuration(parent_package='',top_path=None):
+     # Fortran+f2py extension module for testing odeint.
+     cfg = combine_dict(lapack_opt,
+                        libraries=['lsoda', 'mach'])
+-    ext = config.add_extension('_test_odeint_banded',
+-                               sources=odeint_banded_test_src,
+-                               depends=(lsoda_src + mach_src),
+-                               f2py_options=f2py_options,
+-                               **cfg)
++    #ext = config.add_extension('_test_odeint_banded',
++    #                           sources=odeint_banded_test_src,
++    #                           depends=(lsoda_src + mach_src),
++    #                           f2py_options=f2py_options,
++    #                           **cfg)
+     ext._pre_build_hook = pre_build_hook
+
+     config.add_subpackage('_ivp')
+diff --git a/scipy/interpolate/tests/test_gil.py b/scipy/interpolate/tests/test_gil.py
+index f049751..35de0f5 100755
+--- a/scipy/interpolate/tests/test_gil.py
++++ b/scipy/interpolate/tests/test_gil.py
+@@ -1,5 +1,5 @@
+ import itertools
+-import threading
++import dummy_threading as threading
+ import time
+
+ import numpy as np
+diff --git a/scipy/linalg/setup.py b/scipy/linalg/setup.py
+index 4800853..f83794e 100755
+--- a/scipy/linalg/setup.py
++++ b/scipy/linalg/setup.py
+@@ -9,7 +9,13 @@ def configuration(parent_package='', top_path=None):
+
+     config = Configuration('linalg', parent_package, top_path)
+
+-    lapack_opt = get_info('lapack_opt')
++    lapack_opt = {  # libraries will be auto-generated by pywasmcross
++                  'libraries': [],
++                  'include_dirs': [],
++                  'library_dirs': ['../../../../CLAPACK/CLAPACK-WA/'],
++                  'language': 'f77',
++                  'define_macros': [('NO_ATLAS_INFO', 1),
++                                   ('HAVE_CBLAS', None)]}
+
+     atlas_version = ([v[3:-3] for k, v in lapack_opt.get('define_macros', [])
+                       if k == 'ATLAS_INFO']+[None])[0]
+@@ -68,11 +74,23 @@ def configuration(parent_package='', top_path=None):
+                          )
+
+     # _interpolative:
+-    ext = config.add_extension('_interpolative',
+-                               sources=[join('src', 'id_dist', 'src', '*.f'),
+-                                        "interpolative.pyf"],
+-                               extra_info=lapack_opt
+-                               )
++        # TODO: The following fails with,
++        # scipy/linalg/src/id_dist/src/idd_sfft.c:114:22: error: conflicting types for 'idd_sffti1__'
++        # /* Subroutine */ int idd_sffti1__(integer *ind, integer *n, doublereal *wsave)
++        #                      ^
++        # scipy/linalg/src/id_dist/src/idd_sfft.c:72:33: note: previous declaration is here
++        #     extern /* Subroutine */ int idd_sffti1__(integer *, integer *,
++        #                                 ^
++        # scipy/linalg/src/id_dist/src/idd_sfft.c:371:22: error: conflicting types for 'idd_sfft1__'
++        # /* Subroutine */ int idd_sfft1__(integer *ind, integer *n, doublereal *v,
++        #                      ^
++        # scipy/linalg/src/id_dist/src/idd_sfft.c:311:33: note: previous declaration is here
++        #    extern /* Subroutine */ int idd_sfft1__(integer *, integer *, doublereal *<Paste>
++        #
++        #config.add_extension('_interpolative', fnames + ["interpolative.pyf"],
++        #                     extra_info=lapack_opt
++        #                     )
++
+     ext._pre_build_hook = gfortran_legacy_flag_hook
+
+     # _solve_toeplitz:
+diff --git a/scipy/ndimage/tests/test_filters.py b/scipy/ndimage/tests/test_filters.py
+index 3fdf9b1..031f9ce 100755
+--- a/scipy/ndimage/tests/test_filters.py
++++ b/scipy/ndimage/tests/test_filters.py
+@@ -318,7 +318,7 @@ def test_gaussian_truncate():
+
+ class TestThreading(object):
+     def check_func_thread(self, n, fun, args, out):
+-        from threading import Thread
++        from dummy_threading import Thread
+         thrds = [Thread(target=fun, args=args, kwargs={'output': out[x]}) for x in range(n)]
+         [t.start() for t in thrds]
+         [t.join() for t in thrds]
+diff --git a/scipy/optimize/__init__.py b/scipy/optimize/__init__.py
+index 4ba647a..a9a0abd 100755
+--- a/scipy/optimize/__init__.py
++++ b/scipy/optimize/__init__.py
+@@ -392,7 +392,7 @@ from .minpack import *
+ from .zeros import *
+ from .lbfgsb import fmin_l_bfgs_b, LbfgsInvHessProduct
+ from .tnc import fmin_tnc
+-from .cobyla import fmin_cobyla
++#from .cobyla import fmin_cobyla
+ from .nonlin import *
+ from .slsqp import fmin_slsqp
+ from ._nnls import nnls
+diff --git a/scipy/optimize/_minimize.py b/scipy/optimize/_minimize.py
+index f43b69f..5b3ca53 100755
+--- a/scipy/optimize/_minimize.py
++++ b/scipy/optimize/_minimize.py
+@@ -29,7 +29,8 @@ from ._trustregion_constr import _minimize_trustregion_constr
+ # constrained minimization
+ from .lbfgsb import _minimize_lbfgsb
+ from .tnc import _minimize_tnc
+-from .cobyla import _minimize_cobyla
++#from .cobyla import _minimize_cobyla
++_minimize_cobyla = None
+ from .slsqp import _minimize_slsqp
+ from ._constraints import (old_bound_to_new, new_bounds_to_old,
+                            old_constraint_to_new, new_constraint_to_old,
+diff --git a/scipy/optimize/setup.py b/scipy/optimize/setup.py
+index f563cd5..5046920 100755
+--- a/scipy/optimize/setup.py
++++ b/scipy/optimize/setup.py
+@@ -76,10 +76,10 @@ def configuration(parent_package='', top_path=None):
+                          depends=[join('tnc', 'tnc.h')],
+                          **numpy_nodepr_api)
+
+-    config.add_extension('_cobyla',
+-                         sources=[join('cobyla', x) for x in [
+-                             'cobyla.pyf', 'cobyla2.f', 'trstlp.f']],
+-                         **numpy_nodepr_api)
++    #config.add_extension('_cobyla',
++    #                     sources=[join('cobyla', x) for x in [
++    #                         'cobyla.pyf', 'cobyla2.f', 'trstlp.f']],
++    #                     **numpy_nodepr_api)
+
+     sources = ['minpack2.pyf', 'dcsrch.f', 'dcstep.f']
+     config.add_extension('minpack2',
+diff --git a/scipy/optimize/zeros.c b/scipy/optimize/zeros.c
+index e8cb3dc..128ce67 100755
+--- a/scipy/optimize/zeros.c
++++ b/scipy/optimize/zeros.c
+@@ -201,6 +201,10 @@ PyObject *PyInit__zeros(void)
+ {
+     PyObject *m;
+
++    volatile long x;
++    x = (long)malloc(0);
++    free((void*)x);
++
+     m = PyModule_Create(&moduledef);
+
+     return m;
+diff --git a/scipy/sparse/linalg/eigen/arpack/setup.py b/scipy/sparse/linalg/eigen/arpack/setup.py
+index 703eea5..1b88d31 100755
+--- a/scipy/sparse/linalg/eigen/arpack/setup.py
++++ b/scipy/sparse/linalg/eigen/arpack/setup.py
+@@ -15,7 +15,13 @@ def configuration(parent_package='',top_path=None):
+                           blas_ilp64_pre_build_hook(lapack_opt))
+         f2py_options = get_f2py_int64_options()
+     else:
+-        lapack_opt = get_info('lapack_opt')
++        lapack_opt = {  # libraries will be auto-generated by pywasmcross
++                      'libraries': [],
++                      'include_dirs': [],
++                      'library_dirs': ['../../../../CLAPACK/CLAPACK-WA/'],
++                      'language': 'f77',
++                      'define_macros': [('NO_ATLAS_INFO', 1),
++                                         ('HAVE_CBLAS', None)]}
+         pre_build_hook = gfortran_legacy_flag_hook
+         f2py_options = None
+
+diff --git a/scipy/sparse/linalg/isolve/setup.py b/scipy/sparse/linalg/isolve/setup.py
+index 829e5f4..08d6b75 100755
+--- a/scipy/sparse/linalg/isolve/setup.py
++++ b/scipy/sparse/linalg/isolve/setup.py
+@@ -14,7 +14,13 @@ def configuration(parent_package='',top_path=None):
+         f2py_options = get_f2py_int64_options()
+         pre_build_hook = blas_ilp64_pre_build_hook(lapack_opt)
+     else:
+-        lapack_opt = get_info('lapack_opt')
++        lapack_opt = { # libraries will be auto-generated by pywasmcross
++                      'libraries': [],
++                      'include_dirs': [],
++                      'library_dirs': ['../../../../CLAPACK/CLAPACK-WA/'],
++                      'language': 'f77',
++                      'define_macros': [('NO_ATLAS_INFO', 1),
++                                        ('HAVE_CBLAS', None)]}
+         f2py_options = None
+         pre_build_hook = None
+
+diff --git a/scipy/sparse/tests/test_sparsetools.py b/scipy/sparse/tests/test_sparsetools.py
+index 0c208ef..fd80e0b 100755
+--- a/scipy/sparse/tests/test_sparsetools.py
++++ b/scipy/sparse/tests/test_sparsetools.py
+@@ -1,7 +1,7 @@
+ import sys
+ import os
+ import gc
+-import threading
++import dummy_threading as threading
+
+ import numpy as np
+ from numpy.testing import assert_equal, assert_, assert_allclose
+diff --git a/scipy/spatial/ckdtree.pyx b/scipy/spatial/ckdtree.pyx
+index d564c8e..0e06a8f 100755
+--- a/scipy/spatial/ckdtree.pyx
++++ b/scipy/spatial/ckdtree.pyx
+@@ -19,13 +19,12 @@ from libcpp.algorithm cimport sort
+
+ cimport cython
+
+-from multiprocessing import cpu_count
+-import threading
++import dummy_threading as threading
+
+ cdef extern from "<limits.h>":
+     long LONG_MAX
+
+-cdef int number_of_processors = cpu_count()
++cdef int number_of_processors = 1
+
+ __all__ = ['cKDTree']
+
+@@ -158,7 +157,7 @@ cdef extern from "ordered_pair.h":
+ # coo_entry wrapper
+ # =================
+
+-cdef class coo_entries:
++cdef class coo_entries(object):
+
+     cdef:
+         readonly object __array_interface__
+diff --git a/scipy/spatial/qhull.pyx b/scipy/spatial/qhull.pyx
+index 7b46afd..dea910d 100755
+--- a/scipy/spatial/qhull.pyx
++++ b/scipy/spatial/qhull.pyx
+@@ -10,7 +10,7 @@ Wrappers for Qhull triangulation, plus some additional N-D geometry utilities
+ # Distributed under the same BSD license as Scipy.
+ #
+
+-import threading
++import dummy_threading as threading
+ import numpy as np
+ cimport numpy as np
+ cimport cython
+diff --git a/scipy/special/__init__.py b/scipy/special/__init__.py
+index 12a6ba6..ac99d0d 100755
+--- a/scipy/special/__init__.py
++++ b/scipy/special/__init__.py
+@@ -644,7 +644,6 @@ from .orthogonal import *
+ from .spfun_stats import multigammaln
+ from ._ellip_harm import (
+     ellip_harm,
+-    ellip_harm_2,
+     ellip_normal
+ )
+ from ._lambertw import lambertw
+diff --git a/scipy/special/_ellip_harm.py b/scipy/special/_ellip_harm.py
+index f898f36..2675dcd 100755
+--- a/scipy/special/_ellip_harm.py
++++ b/scipy/special/_ellip_harm.py
+@@ -1,9 +1,13 @@
+ import numpy as np
+
+ from ._ufuncs import _ellip_harm
+-from ._ellip_harm_2 import _ellipsoid, _ellipsoid_norm
++def _raise_error(*cargs, **kwargs):
++    raise NotImplementedError
+
+
++_ellipsoid = _raise_error
++_ellipsoid_norm = _raise_error
++
+ def ellip_harm(h2, k2, n, p, s, signm=1, signn=1):
+     r"""
+     Ellipsoidal harmonic functions E^p_n(l)
+diff --git a/scipy/special/setup.py b/scipy/special/setup.py
+index 81eb09f..f93b31a 100755
+--- a/scipy/special/setup.py
++++ b/scipy/special/setup.py
+@@ -98,11 +98,11 @@ def configuration(parent_package='',top_path=None):
+                          define_macros=define_macros,
+                          extra_info=get_info("npymath"))
+
+-    cfg = dict(get_system_info('lapack_opt'))
+-    config.add_extension('_ellip_harm_2',
+-                         sources=['_ellip_harm_2.c', 'sf_error.c',],
+-                         **cfg
+-                         )
++    #cfg = dict(get_system_info('lapack_opt'))
++    #config.add_extension('_ellip_harm_2',
++    #                     sources=['_ellip_harm_2.c', 'sf_error.c',],
++    #                     **cfg
++    #                     )
+
+     # Cython API
+     config.add_data_files('cython_special.pxd')
+diff --git a/scipy/stats/kde.py b/scipy/stats/kde.py
+index ed082e3..91e52cb 100755
+--- a/scipy/stats/kde.py
++++ b/scipy/stats/kde.py
+@@ -31,7 +31,11 @@ from numpy import (asarray, atleast_2d, reshape, zeros, newaxis, dot, exp, pi,
+ import numpy as np
+
+ # Local imports.
+-from . import mvn
++try:
++    from . import mvn
++except ImportError:
++    mvn = None
++
+ from ._stats import gaussian_kernel_estimate
+
+
+diff --git a/scipy/stats/setup.py b/scipy/stats/setup.py
+index 94dc721..abbb1f0 100755
+--- a/scipy/stats/setup.py
++++ b/scipy/stats/setup.py
+@@ -24,9 +24,9 @@ def configuration(parent_package='',top_path=None):
+     )
+
+     # add mvn module
+-    config.add_extension('mvn',
+-        sources=['mvn.pyf','mvndst.f'],
+-    )
++    #config.add_extension('mvn',
++    #    sources=['mvn.pyf','mvndst.f'],
++    #)
+
+     return config
+
