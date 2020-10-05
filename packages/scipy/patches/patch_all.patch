@@ -1,3 +1,20 @@
+diff --git a/scipy/_build_utils/system_info.py b/scipy/_build_utils/system_info.py
+index 58eb354..8557e56 100755
+--- a/scipy/_build_utils/system_info.py
++++ b/scipy/_build_utils/system_info.py
+@@ -131,9 +131,9 @@ else:
+                 else:
+                     warnings.warn(LapackNotFoundError.__doc__, stacklevel=2)
+                     lapack_src_info = get_info('lapack_src')
+-                    if not lapack_src_info:
+-                        warnings.warn(LapackSrcNotFoundError.__doc__, stacklevel=2)
+-                        return
++                    #if not lapack_src_info:
++                    #    warnings.warn(LapackSrcNotFoundError.__doc__, stacklevel=2)
++                    #    return
+                     dict_append(info, libraries=[('flapack_src', lapack_src_info)])
+
+             if need_blas:
 diff --git a/scipy/integrate/_ode.py b/scipy/integrate/_ode.py
 index 3094650..3fb6269 100755
 --- a/scipy/integrate/_ode.py
