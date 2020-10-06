@@ -1,0 +1,52 @@
+diff --git a/setup.py b/setup.py
+index 6b6b644..b47443c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -127,6 +127,8 @@ class BuildExt(build_ext.build_ext):  # pylint: disable=too-many-ancestors
+             copy_tree(src_dir, os.path.join(self.build_temp, src_dir))
+         build_dir = self.build_temp
+         global BUILD_TEMP_DIR  # pylint: disable=global-statement
++        print("Settign var")
++        print(build_dir)
+         BUILD_TEMP_DIR = build_dir
+         libxgboost = os.path.abspath(
+             os.path.join(CURRENT_DIR, os.path.pardir, 'lib', lib_name()))
+@@ -211,9 +213,13 @@ class InstallLib(install_lib.install_lib):
+         dst = os.path.join(self.install_dir, 'xgboost', 'lib', lib_name())
+ 
+         global BUILD_TEMP_DIR   # pylint: disable=global-statement
++        if not BUILD_TEMP_DIR:
++            BUILD_TEMP_DIR = "/home/biolib/pyodide-fork/cpython/build/3.7.4/host/lib/python3.7/site-packages"
+         libxgboost_path = lib_name()
+ 
+         dft_lib_dir = os.path.join(CURRENT_DIR, os.path.pardir, 'lib')
++        print("Hi")
++        print(BUILD_TEMP_DIR)
+         build_dir = os.path.join(BUILD_TEMP_DIR, 'xgboost', 'lib')
+ 
+         if os.path.exists(os.path.join(dft_lib_dir, libxgboost_path)):
+diff --git a/xgboost/dmlc-core/CMakeLists.txt b/xgboost/dmlc-core/CMakeLists.txt
+index 141db72..dc73b4e 100644
+--- a/xgboost/dmlc-core/CMakeLists.txt
++++ b/xgboost/dmlc-core/CMakeLists.txt
+@@ -149,13 +149,13 @@ else()
+ endif()
+ 
+ # Check endianness
+-include(TestBigEndian)
+-test_big_endian(BIG_ENDIAN)
+-if(BIG_ENDIAN)
+-  set(DMLC_CMAKE_LITTLE_ENDIAN 0)
+-else()
+-  set(DMLC_CMAKE_LITTLE_ENDIAN 1)
+-endif()
++#include(TestBigEndian)
++#test_big_endian(BIG_ENDIAN)
++#if(BIG_ENDIAN)
++#  set(DMLC_CMAKE_LITTLE_ENDIAN 0)
++#else()
++set(DMLC_CMAKE_LITTLE_ENDIAN 1)
++#endif()
+ 
+ message(STATUS "${CMAKE_LOCAL}/build_config.h.in -> include/dmlc/build_config.h")
+ configure_file("cmake/build_config.h.in" "include/dmlc/build_config.h")
