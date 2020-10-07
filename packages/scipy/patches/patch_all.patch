@@ -13,16 +13,116 @@ index 58eb354..8557e56 100755
 +                    #    warnings.warn(LapackSrcNotFoundError.__doc__, stacklevel=2)
 +                    #    return
                      dict_append(info, libraries=[('flapack_src', lapack_src_info)])
-
+ 
              if need_blas:
+diff --git a/scipy/_lib/_ccallback.py b/scipy/_lib/_ccallback.py
+index 6b63f5f..bfc419d 100755
+--- a/scipy/_lib/_ccallback.py
++++ b/scipy/_lib/_ccallback.py
+@@ -1,8 +1,8 @@
+-from . import _ccallback_c
++#from . import _ccallback_c
+ 
+-import ctypes
++#import ctypes
+ 
+-PyCFuncPtr = ctypes.CFUNCTYPE(ctypes.c_void_p).__bases__[0]
++#PyCFuncPtr = ctypes.CFUNCTYPE(ctypes.c_void_p).__bases__[0]
+ 
+ ffi = None
+ 
+diff --git a/scipy/_lib/_uarray/_backend.py b/scipy/_lib/_uarray/_backend.py
+index af3c899..68ebe3a 100755
+--- a/scipy/_lib/_uarray/_backend.py
++++ b/scipy/_lib/_uarray/_backend.py
+@@ -1,7 +1,7 @@
+ import typing
+ import inspect
+ import functools
+-from . import _uarray  # type: ignore
++#from . import _uarray  # type: ignore
+ import copyreg  # type: ignore
+ import atexit
+ import pickle
+@@ -11,12 +11,12 @@ ArgumentReplacerType = typing.Callable[
+     [typing.Tuple, typing.Dict, typing.Tuple], typing.Tuple[typing.Tuple, typing.Dict]
+ ]
+ 
+-from ._uarray import (  # type: ignore
+-    BackendNotImplementedError,
+-    _Function,
+-    _SkipBackendContext,
+-    _SetBackendContext,
+-)
++#from ._uarray import (  # type: ignore
++#    BackendNotImplementedError,
++#    _Function,
++#    _SkipBackendContext,
++#    _SetBackendContext,
++#)
+ 
+ __all__ = [
+     "set_backend",
+@@ -26,8 +26,8 @@ __all__ = [
+     "clear_backends",
+     "create_multimethod",
+     "generate_multimethod",
+-    "_Function",
+-    "BackendNotImplementedError",
++    #"_Function",
++    #"BackendNotImplementedError",
+     "Dispatchable",
+     "wrap_single_convertor",
+     "all_of_type",
+@@ -65,8 +65,8 @@ def pickle_function(func):
+     return unpickle_function, (mod_name, qname)
+ 
+ 
+-copyreg.pickle(_Function, pickle_function)
+-atexit.register(_uarray.clear_all_globals)
++#copyreg.pickle(_Function, pickle_function)
++#atexit.register(_uarray.clear_all_globals)
+ 
+ 
+ def create_multimethod(*args, **kwargs):
+diff --git a/scipy/fft/_backend.py b/scipy/fft/_backend.py
+index b2cf29d..a9c3408 100755
+--- a/scipy/fft/_backend.py
++++ b/scipy/fft/_backend.py
+@@ -1,4 +1,4 @@
+-import scipy._lib.uarray as ua
++#import scipy._lib.uarray as ua
+ from . import _pocketfft
+ 
+ 
+@@ -177,4 +177,4 @@ def skip_backend(backend):
+     return ua.skip_backend(backend)
+ 
+ 
+-set_global_backend('scipy')
++#set_global_backend('scipy')
+diff --git a/scipy/fft/_basic.py b/scipy/fft/_basic.py
+index b433d4b..e6cc909 100755
+--- a/scipy/fft/_basic.py
++++ b/scipy/fft/_basic.py
+@@ -17,7 +17,8 @@ def _dispatch(func):
+     """
+     Function annotation that creates a uarray multimethod from the function
+     """
+-    return generate_multimethod(func, _x_replacer, domain="numpy.scipy.fft")
++    return func
++    #return generate_multimethod(func, _x_replacer, domain="numpy.scipy.fft")
+ 
+ 
+ @_dispatch
 diff --git a/scipy/integrate/_ode.py b/scipy/integrate/_ode.py
 index 3094650..3fb6269 100755
 --- a/scipy/integrate/_ode.py
 +++ b/scipy/integrate/_ode.py
 @@ -87,9 +87,19 @@ import warnings
-
+ 
  from numpy import asarray, array, zeros, isscalar, real, imag, vstack
-
+ 
 -from . import vode as _vode
 -from . import _dop
 -from . import lsoda as _lsoda
@@ -39,8 +139,8 @@ index 3094650..3fb6269 100755
 +    from . import lsoda as _lsoda
 +except ImportError:
 +    _lsoda = None
-
-
+ 
+ 
  _dop_int_dtype = _dop.types.intvar.dtype
 diff --git a/scipy/integrate/odepack.py b/scipy/integrate/odepack.py
 index 8119d2a..9a72505 100755
@@ -48,92 +148,110 @@ index 8119d2a..9a72505 100755
 +++ b/scipy/integrate/odepack.py
 @@ -3,7 +3,8 @@
  __all__ = ['odeint']
-
+ 
  import numpy as np
 -from . import _odepack
 +# from . import _odepack
 +_odepack = None
  from copy import copy
  import warnings
-
+ 
 diff --git a/scipy/integrate/setup.py b/scipy/integrate/setup.py
-index 11ce3d1..ebcfc5f 100755
+index 11ce3d1..930ec48 100755
 --- a/scipy/integrate/setup.py
 +++ b/scipy/integrate/setup.py
-@@ -56,37 +56,37 @@ def configuration(parent_package='',top_path=None):
+@@ -54,53 +54,53 @@ def configuration(parent_package='',top_path=None):
+                          **cfg)
+ 
      # odepack/lsoda-odeint
-     cfg = combine_dict(lapack_opt, numpy_nodepr_api,
-                        libraries=['lsoda', 'mach'])
+-    cfg = combine_dict(lapack_opt, numpy_nodepr_api,
+-                       libraries=['lsoda', 'mach'])
 -    config.add_extension('_odepack',
 -                         sources=['_odepackmodule.c'],
 -                         depends=(lsoda_src + mach_src),
 -                         **cfg)
++    #cfg = combine_dict(lapack_opt, numpy_nodepr_api,
++    #                   libraries=['lsoda', 'mach'])
 +    #config.add_extension('_odepack',
 +    #                     sources=['_odepackmodule.c'],
 +    #                     depends=(lsoda_src + mach_src),
 +    #                     **cfg)
-
+ 
      # vode
-     cfg = combine_dict(lapack_opt,
-                        libraries=['vode'])
+-    cfg = combine_dict(lapack_opt,
+-                       libraries=['vode'])
 -    ext = config.add_extension('vode',
 -                               sources=['vode.pyf'],
 -                               depends=vode_src,
 -                               f2py_options=f2py_options,
 -                               **cfg)
+-    ext._pre_build_hook = pre_build_hook
++    #cfg = combine_dict(lapack_opt,
++    #                   libraries=['vode'])
 +    #ext = config.add_extension('vode',
 +    #                           sources=['vode.pyf'],
 +    #                           depends=vode_src,
 +    #                           f2py_options=f2py_options,
 +    #                           **cfg)
-     ext._pre_build_hook = pre_build_hook
-
++    #ext._pre_build_hook = pre_build_hook
+ 
      # lsoda
-     cfg = combine_dict(lapack_opt,
-                        libraries=['lsoda', 'mach'])
+-    cfg = combine_dict(lapack_opt,
+-                       libraries=['lsoda', 'mach'])
 -    ext = config.add_extension('lsoda',
 -                               sources=['lsoda.pyf'],
 -                               depends=(lsoda_src + mach_src),
 -                               f2py_options=f2py_options,
 -                               **cfg)
+-    ext._pre_build_hook = pre_build_hook
++    #cfg = combine_dict(lapack_opt,
++    #                   libraries=['lsoda', 'mach'])
 +    #ext = config.add_extension('lsoda',
 +    #                           sources=['lsoda.pyf'],
 +    #                           depends=(lsoda_src + mach_src),
 +    #                           f2py_options=f2py_options,
 +    #                           **cfg)
-     ext._pre_build_hook = pre_build_hook
-
++    #ext._pre_build_hook = pre_build_hook
+ 
      # dop
 -    ext = config.add_extension('_dop',
 -                               sources=['dop.pyf'],
 -                               libraries=['dop'],
 -                               depends=dop_src,
 -                               f2py_options=f2py_options)
+-    ext._pre_build_hook = pre_build_hook
 +    #ext = config.add_extension('_dop',
 +    #                           sources=['dop.pyf'],
 +    #                           libraries=['dop'],
 +    #                           depends=dop_src,
 +    #                           f2py_options=f2py_options)
-     ext._pre_build_hook = pre_build_hook
-
-     config.add_extension('_test_multivariate',
-@@ -95,11 +95,11 @@ def configuration(parent_package='',top_path=None):
++    #ext._pre_build_hook = pre_build_hook
+ 
+-    config.add_extension('_test_multivariate',
+-                         sources=quadpack_test_src)
++    #config.add_extension('_test_multivariate',
++    #                     sources=quadpack_test_src)
+ 
      # Fortran+f2py extension module for testing odeint.
-     cfg = combine_dict(lapack_opt,
-                        libraries=['lsoda', 'mach'])
+-    cfg = combine_dict(lapack_opt,
+-                       libraries=['lsoda', 'mach'])
 -    ext = config.add_extension('_test_odeint_banded',
 -                               sources=odeint_banded_test_src,
 -                               depends=(lsoda_src + mach_src),
 -                               f2py_options=f2py_options,
 -                               **cfg)
+-    ext._pre_build_hook = pre_build_hook
++    #cfg = combine_dict(lapack_opt,
++    #                   libraries=['lsoda', 'mach'])
 +    #ext = config.add_extension('_test_odeint_banded',
 +    #                           sources=odeint_banded_test_src,
 +    #                           depends=(lsoda_src + mach_src),
 +    #                           f2py_options=f2py_options,
 +    #                           **cfg)
-     ext._pre_build_hook = pre_build_hook
-
++    #ext._pre_build_hook = pre_build_hook
+ 
      config.add_subpackage('_ivp')
+ 
 diff --git a/scipy/interpolate/tests/test_gil.py b/scipy/interpolate/tests/test_gil.py
 index f049751..35de0f5 100755
 --- a/scipy/interpolate/tests/test_gil.py
@@ -143,16 +261,67 @@ index f049751..35de0f5 100755
 -import threading
 +import dummy_threading as threading
  import time
-
+ 
  import numpy as np
+diff --git a/scipy/io/_test_fortran.f b/scipy/io/_test_fortran.f
+index d821a70..fc8e243 100755
+--- a/scipy/io/_test_fortran.f
++++ b/scipy/io/_test_fortran.f
+@@ -1,30 +1,30 @@
+       subroutine read_unformatted_double(m, n, k, a, filename)
+       implicit none
+-      integer :: m, n, k
+-      double precision :: a(m,n,k)
+-      character*4096 :: filename
+-      open(10, file=trim(filename), form='unformatted')
++      integer m, n, k
++      double precision a(m,n,k)
++      character*4096 filename
++      open(10, file=filename, form='unformatted')
+       read(10) a
+       close(10)
+-      end subroutine
++      end
+ 
+       subroutine read_unformatted_int(m, n, k, a, filename)
+       implicit none
+-      integer :: m, n, k
+-      integer :: a(m,n,k)
+-      character*4096 :: filename
+-      open(10, file=trim(filename), form='unformatted')
++      integer m, n, k
++      integer a(m,n,k)
++      character*4096 filename
++      open(10, file=filename, form='unformatted')
+       read(10) a
+       close(10)
+-      end subroutine
++      end
+ 
+       subroutine read_unformatted_mixed(m, n, k, a, b, filename)
+       implicit none
+-      integer :: m, n, k
+-      double precision :: a(m,n)
+-      integer :: b(k)
+-      character*4096 :: filename
+-      open(10, file=trim(filename), form='unformatted')
++      integer m, n, k
++      double precision a(m,n)
++      integer b(k)
++      character*4096 filename
++      open(10, file=filename, form='unformatted')
+       read(10) a, b
+       close(10)
+-      end subroutine
++      end
 diff --git a/scipy/linalg/setup.py b/scipy/linalg/setup.py
-index 4800853..f83794e 100755
+index 4800853..67ee4dd 100755
 --- a/scipy/linalg/setup.py
 +++ b/scipy/linalg/setup.py
 @@ -9,7 +9,13 @@ def configuration(parent_package='', top_path=None):
-
+ 
      config = Configuration('linalg', parent_package, top_path)
-
+ 
 -    lapack_opt = get_info('lapack_opt')
 +    lapack_opt = {  # libraries will be auto-generated by pywasmcross
 +                  'libraries': [],
@@ -161,18 +330,19 @@ index 4800853..f83794e 100755
 +                  'language': 'f77',
 +                  'define_macros': [('NO_ATLAS_INFO', 1),
 +                                   ('HAVE_CBLAS', None)]}
-
+ 
      atlas_version = ([v[3:-3] for k, v in lapack_opt.get('define_macros', [])
                        if k == 'ATLAS_INFO']+[None])[0]
-@@ -68,11 +74,23 @@ def configuration(parent_package='', top_path=None):
+@@ -68,12 +74,24 @@ def configuration(parent_package='', top_path=None):
                           )
-
+ 
      # _interpolative:
 -    ext = config.add_extension('_interpolative',
 -                               sources=[join('src', 'id_dist', 'src', '*.f'),
 -                                        "interpolative.pyf"],
 -                               extra_info=lapack_opt
 -                               )
+-    ext._pre_build_hook = gfortran_legacy_flag_hook
 +        # TODO: The following fails with,
 +        # scipy/linalg/src/id_dist/src/idd_sfft.c:114:22: error: conflicting types for 'idd_sffti1__'
 +        # /* Subroutine */ int idd_sffti1__(integer *ind, integer *n, doublereal *wsave)
@@ -190,15 +360,16 @@ index 4800853..f83794e 100755
 +        #                     extra_info=lapack_opt
 +        #                     )
 +
-     ext._pre_build_hook = gfortran_legacy_flag_hook
-
++    #ext._pre_build_hook = gfortran_legacy_flag_hook
+ 
      # _solve_toeplitz:
+     config.add_extension('_solve_toeplitz',
 diff --git a/scipy/ndimage/tests/test_filters.py b/scipy/ndimage/tests/test_filters.py
 index 3fdf9b1..031f9ce 100755
 --- a/scipy/ndimage/tests/test_filters.py
 +++ b/scipy/ndimage/tests/test_filters.py
 @@ -318,7 +318,7 @@ def test_gaussian_truncate():
-
+ 
  class TestThreading(object):
      def check_func_thread(self, n, fun, args, out):
 -        from threading import Thread
@@ -206,6 +377,19 @@ index 3fdf9b1..031f9ce 100755
          thrds = [Thread(target=fun, args=args, kwargs={'output': out[x]}) for x in range(n)]
          [t.start() for t in thrds]
          [t.join() for t in thrds]
+diff --git a/scipy/odr/setup.py b/scipy/odr/setup.py
+index c75ab37..5c96621 100755
+--- a/scipy/odr/setup.py
++++ b/scipy/odr/setup.py
+@@ -25,7 +25,7 @@ def configuration(parent_package='', top_path=None):
+     sources = ['__odrpack.c']
+     libraries = ['odrpack'] + blas_info.pop('libraries', [])
+     include_dirs = ['.'] + blas_info.pop('include_dirs', [])
+-    blas_info['define_macros'].extend(numpy_nodepr_api['define_macros'])
++    #blas_info['define_macros'].extend(numpy_nodepr_api['define_macros'])
+     config.add_extension('__odrpack',
+         sources=sources,
+         libraries=libraries,
 diff --git a/scipy/optimize/__init__.py b/scipy/optimize/__init__.py
 index 4ba647a..a9a0abd 100755
 --- a/scipy/optimize/__init__.py
@@ -233,6 +417,259 @@ index f43b69f..5b3ca53 100755
  from .slsqp import _minimize_slsqp
  from ._constraints import (old_bound_to_new, new_bounds_to_old,
                             old_constraint_to_new, new_constraint_to_old,
+diff --git a/scipy/optimize/minpack/chkder.f b/scipy/optimize/minpack/chkder.f
+index 0657ab5..29578fc 100755
+--- a/scipy/optimize/minpack/chkder.f
++++ b/scipy/optimize/minpack/chkder.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine chkder(m,n,x,fvec,fjac,ldfjac,xp,fvecp,mode,err)
++      subroutine chkder(m,n,x,fvec,fjac,ldfjac,xp,fvecp,mode,err)
+       integer m,n,ldfjac,mode
+       double precision x(n),fvec(m),fjac(ldfjac,n),xp(n),fvecp(m),
+      *                 err(m)
+diff --git a/scipy/optimize/minpack/dogleg.f b/scipy/optimize/minpack/dogleg.f
+index d9626c9..b812f19 100755
+--- a/scipy/optimize/minpack/dogleg.f
++++ b/scipy/optimize/minpack/dogleg.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine dogleg(n,r,lr,diag,qtb,delta,x,wa1,wa2)
++      subroutine dogleg(n,r,lr,diag,qtb,delta,x,wa1,wa2)
+       integer n,lr
+       double precision delta
+       double precision r(lr),diag(n),qtb(n),x(n),wa1(n),wa2(n)
+diff --git a/scipy/optimize/minpack/dpmpar.f b/scipy/optimize/minpack/dpmpar.f
+index 3fd3b4e..cb6545a 100755
+--- a/scipy/optimize/minpack/dpmpar.f
++++ b/scipy/optimize/minpack/dpmpar.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *double precision function dpmpar(i)
++      double precision function dpmpar(i)
+       integer i
+ c     **********
+ c
+diff --git a/scipy/optimize/minpack/enorm.f b/scipy/optimize/minpack/enorm.f
+index 21557c1..2cb5b60 100755
+--- a/scipy/optimize/minpack/enorm.f
++++ b/scipy/optimize/minpack/enorm.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *double precision function enorm(n,x)
++      double precision function enorm(n,x)
+       integer n
+       double precision x(n)
+ c     **********
+diff --git a/scipy/optimize/minpack/fdjac1.f b/scipy/optimize/minpack/fdjac1.f
+index 2a7d84c..031ed46 100755
+--- a/scipy/optimize/minpack/fdjac1.f
++++ b/scipy/optimize/minpack/fdjac1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine fdjac1(fcn,n,x,fvec,fjac,ldfjac,iflag,ml,mu,epsfcn,
++      subroutine fdjac1(fcn,n,x,fvec,fjac,ldfjac,iflag,ml,mu,epsfcn,
+      *                  wa1,wa2)
+       integer n,ldfjac,iflag,ml,mu
+       double precision epsfcn
+diff --git a/scipy/optimize/minpack/fdjac2.f b/scipy/optimize/minpack/fdjac2.f
+index 5f4c133..218ab94 100755
+--- a/scipy/optimize/minpack/fdjac2.f
++++ b/scipy/optimize/minpack/fdjac2.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,epsfcn,wa)
++      subroutine fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,epsfcn,wa)
+       integer m,n,ldfjac,iflag
+       double precision epsfcn
+       double precision x(n),fvec(m),fjac(ldfjac,n),wa(m)
+diff --git a/scipy/optimize/minpack/hybrd.f b/scipy/optimize/minpack/hybrd.f
+index 75f450c..fc0b4c2 100755
+--- a/scipy/optimize/minpack/hybrd.f
++++ b/scipy/optimize/minpack/hybrd.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine hybrd(fcn,n,x,fvec,xtol,maxfev,ml,mu,epsfcn,diag,
++      subroutine hybrd(fcn,n,x,fvec,xtol,maxfev,ml,mu,epsfcn,diag,
+      *                 mode,factor,nprint,info,nfev,fjac,ldfjac,r,lr,
+      *                 qtf,wa1,wa2,wa3,wa4)
+       integer n,maxfev,ml,mu,mode,nprint,info,nfev,ldfjac,lr
+diff --git a/scipy/optimize/minpack/hybrd1.f b/scipy/optimize/minpack/hybrd1.f
+index 87660fe..c0a8592 100755
+--- a/scipy/optimize/minpack/hybrd1.f
++++ b/scipy/optimize/minpack/hybrd1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine hybrd1(fcn,n,x,fvec,tol,info,wa,lwa)
++      subroutine hybrd1(fcn,n,x,fvec,tol,info,wa,lwa)
+       integer n,info,lwa
+       double precision tol
+       double precision x(n),fvec(n),wa(lwa)
+diff --git a/scipy/optimize/minpack/hybrj.f b/scipy/optimize/minpack/hybrj.f
+index 4f67683..3070dad 100755
+--- a/scipy/optimize/minpack/hybrj.f
++++ b/scipy/optimize/minpack/hybrj.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine hybrj(fcn,n,x,fvec,fjac,ldfjac,xtol,maxfev,diag,mode,
++      subroutine hybrj(fcn,n,x,fvec,fjac,ldfjac,xtol,maxfev,diag,mode,
+      *                 factor,nprint,info,nfev,njev,r,lr,qtf,wa1,wa2,
+      *                 wa3,wa4)
+       integer n,ldfjac,maxfev,mode,nprint,info,nfev,njev,lr
+diff --git a/scipy/optimize/minpack/hybrj1.f b/scipy/optimize/minpack/hybrj1.f
+index afa9d80..9f51c49 100755
+--- a/scipy/optimize/minpack/hybrj1.f
++++ b/scipy/optimize/minpack/hybrj1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine hybrj1(fcn,n,x,fvec,fjac,ldfjac,tol,info,wa,lwa)
++      subroutine hybrj1(fcn,n,x,fvec,fjac,ldfjac,tol,info,wa,lwa)
+       integer n,ldfjac,info,lwa
+       double precision tol
+       double precision x(n),fvec(n),fjac(ldfjac,n),wa(lwa)
+diff --git a/scipy/optimize/minpack/lmder.f b/scipy/optimize/minpack/lmder.f
+index 6849255..8797d8b 100755
+--- a/scipy/optimize/minpack/lmder.f
++++ b/scipy/optimize/minpack/lmder.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmder(fcn,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,
++      subroutine lmder(fcn,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,
+      *                 maxfev,diag,mode,factor,nprint,info,nfev,njev,
+      *                 ipvt,qtf,wa1,wa2,wa3,wa4)
+       integer m,n,ldfjac,maxfev,mode,nprint,info,nfev,njev
+diff --git a/scipy/optimize/minpack/lmder1.f b/scipy/optimize/minpack/lmder1.f
+index 6be2947..d691940 100755
+--- a/scipy/optimize/minpack/lmder1.f
++++ b/scipy/optimize/minpack/lmder1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmder1(fcn,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,
++      subroutine lmder1(fcn,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,
+      *                  lwa)
+       integer m,n,ldfjac,info,lwa
+       integer ipvt(n)
+diff --git a/scipy/optimize/minpack/lmdif.f b/scipy/optimize/minpack/lmdif.f
+index fcb61d1..dd3d4ee 100755
+--- a/scipy/optimize/minpack/lmdif.f
++++ b/scipy/optimize/minpack/lmdif.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmdif(fcn,m,n,x,fvec,ftol,xtol,gtol,maxfev,epsfcn,
++      subroutine lmdif(fcn,m,n,x,fvec,ftol,xtol,gtol,maxfev,epsfcn,
+      *                 diag,mode,factor,nprint,info,nfev,fjac,ldfjac,
+      *                 ipvt,qtf,wa1,wa2,wa3,wa4)
+       integer m,n,maxfev,mode,nprint,info,nfev,ldfjac
+diff --git a/scipy/optimize/minpack/lmdif1.f b/scipy/optimize/minpack/lmdif1.f
+index 6f28ed2..70f8aae 100755
+--- a/scipy/optimize/minpack/lmdif1.f
++++ b/scipy/optimize/minpack/lmdif1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmdif1(fcn,m,n,x,fvec,tol,info,iwa,wa,lwa)
++      subroutine lmdif1(fcn,m,n,x,fvec,tol,info,iwa,wa,lwa)
+       integer m,n,info,lwa
+       integer iwa(n)
+       double precision tol
+diff --git a/scipy/optimize/minpack/lmpar.f b/scipy/optimize/minpack/lmpar.f
+index e25eb0d..26c422a 100755
+--- a/scipy/optimize/minpack/lmpar.f
++++ b/scipy/optimize/minpack/lmpar.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmpar(n,r,ldr,ipvt,diag,qtb,delta,par,x,sdiag,wa1,
++      subroutine lmpar(n,r,ldr,ipvt,diag,qtb,delta,par,x,sdiag,wa1,
+      *                 wa2)
+       integer n,ldr
+       integer ipvt(n)
+diff --git a/scipy/optimize/minpack/lmstr.f b/scipy/optimize/minpack/lmstr.f
+index 2b6bbbf..d9a7893 100755
+--- a/scipy/optimize/minpack/lmstr.f
++++ b/scipy/optimize/minpack/lmstr.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmstr(fcn,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,
++      subroutine lmstr(fcn,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,
+      *                 maxfev,diag,mode,factor,nprint,info,nfev,njev,
+      *                 ipvt,qtf,wa1,wa2,wa3,wa4)
+       integer m,n,ldfjac,maxfev,mode,nprint,info,nfev,njev
+diff --git a/scipy/optimize/minpack/lmstr1.f b/scipy/optimize/minpack/lmstr1.f
+index 225e873..2fa8ee1 100755
+--- a/scipy/optimize/minpack/lmstr1.f
++++ b/scipy/optimize/minpack/lmstr1.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine lmstr1(fcn,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,
++      subroutine lmstr1(fcn,m,n,x,fvec,fjac,ldfjac,tol,info,ipvt,wa,
+      *                  lwa)
+       integer m,n,ldfjac,info,lwa
+       integer ipvt(n)
+diff --git a/scipy/optimize/minpack/qform.f b/scipy/optimize/minpack/qform.f
+index 1f36858..087b247 100755
+--- a/scipy/optimize/minpack/qform.f
++++ b/scipy/optimize/minpack/qform.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine qform(m,n,q,ldq,wa)
++      subroutine qform(m,n,q,ldq,wa)
+       integer m,n,ldq
+       double precision q(ldq,m),wa(m)
+ c     **********
+diff --git a/scipy/optimize/minpack/qrfac.f b/scipy/optimize/minpack/qrfac.f
+index fa67890..cb68608 100755
+--- a/scipy/optimize/minpack/qrfac.f
++++ b/scipy/optimize/minpack/qrfac.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine qrfac(m,n,a,lda,pivot,ipvt,lipvt,rdiag,acnorm,wa)
++      subroutine qrfac(m,n,a,lda,pivot,ipvt,lipvt,rdiag,acnorm,wa)
+       integer m,n,lda,lipvt
+       integer ipvt(lipvt)
+       logical pivot
+diff --git a/scipy/optimize/minpack/qrsolv.f b/scipy/optimize/minpack/qrsolv.f
+index 3dc0097..5580087 100755
+--- a/scipy/optimize/minpack/qrsolv.f
++++ b/scipy/optimize/minpack/qrsolv.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine qrsolv(n,r,ldr,ipvt,diag,qtb,x,sdiag,wa)
++      subroutine qrsolv(n,r,ldr,ipvt,diag,qtb,x,sdiag,wa)
+       integer n,ldr
+       integer ipvt(n)
+       double precision r(ldr,n),diag(n),qtb(n),x(n),sdiag(n),wa(n)
+diff --git a/scipy/optimize/minpack/r1mpyq.f b/scipy/optimize/minpack/r1mpyq.f
+index 1410b9a..ec99b96 100755
+--- a/scipy/optimize/minpack/r1mpyq.f
++++ b/scipy/optimize/minpack/r1mpyq.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine r1mpyq(m,n,a,lda,v,w)
++      subroutine r1mpyq(m,n,a,lda,v,w)
+       integer m,n,lda
+       double precision a(lda,n),v(n),w(n)
+ c     **********
+diff --git a/scipy/optimize/minpack/r1updt.f b/scipy/optimize/minpack/r1updt.f
+index e809d84..e034973 100755
+--- a/scipy/optimize/minpack/r1updt.f
++++ b/scipy/optimize/minpack/r1updt.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine r1updt(m,n,s,ls,u,v,w,sing)
++      subroutine r1updt(m,n,s,ls,u,v,w,sing)
+       integer m,n,ls
+       logical sing
+       double precision s(ls),u(m),v(n),w(m)
+diff --git a/scipy/optimize/minpack/rwupdt.f b/scipy/optimize/minpack/rwupdt.f
+index 61a7928..05282b5 100755
+--- a/scipy/optimize/minpack/rwupdt.f
++++ b/scipy/optimize/minpack/rwupdt.f
+@@ -1,5 +1,4 @@
+-      recursive
+-     *subroutine rwupdt(n,r,ldr,w,b,alpha,cos,sin)
++      subroutine rwupdt(n,r,ldr,w,b,alpha,cos,sin)
+       integer n,ldr
+       double precision alpha
+       double precision r(ldr,n),w(n),b(n),cos(n),sin(n)
 diff --git a/scipy/optimize/setup.py b/scipy/optimize/setup.py
 index f563cd5..5046920 100755
 --- a/scipy/optimize/setup.py
@@ -240,7 +677,7 @@ index f563cd5..5046920 100755
 @@ -76,10 +76,10 @@ def configuration(parent_package='', top_path=None):
                           depends=[join('tnc', 'tnc.h')],
                           **numpy_nodepr_api)
-
+ 
 -    config.add_extension('_cobyla',
 -                         sources=[join('cobyla', x) for x in [
 -                             'cobyla.pyf', 'cobyla2.f', 'trstlp.f']],
@@ -249,7 +686,7 @@ index f563cd5..5046920 100755
 +    #                     sources=[join('cobyla', x) for x in [
 +    #                         'cobyla.pyf', 'cobyla2.f', 'trstlp.f']],
 +    #                     **numpy_nodepr_api)
-
+ 
      sources = ['minpack2.pyf', 'dcsrch.f', 'dcstep.f']
      config.add_extension('minpack2',
 diff --git a/scipy/optimize/zeros.c b/scipy/optimize/zeros.c
@@ -259,13 +696,13 @@ index e8cb3dc..128ce67 100755
 @@ -201,6 +201,10 @@ PyObject *PyInit__zeros(void)
  {
      PyObject *m;
-
+ 
 +    volatile long x;
 +    x = (long)malloc(0);
 +    free((void*)x);
 +
      m = PyModule_Create(&moduledef);
-
+ 
      return m;
 diff --git a/scipy/sparse/linalg/eigen/arpack/setup.py b/scipy/sparse/linalg/eigen/arpack/setup.py
 index 703eea5..1b88d31 100755
@@ -285,7 +722,7 @@ index 703eea5..1b88d31 100755
 +                                         ('HAVE_CBLAS', None)]}
          pre_build_hook = gfortran_legacy_flag_hook
          f2py_options = None
-
+ 
 diff --git a/scipy/sparse/linalg/isolve/setup.py b/scipy/sparse/linalg/isolve/setup.py
 index 829e5f4..08d6b75 100755
 --- a/scipy/sparse/linalg/isolve/setup.py
@@ -304,7 +741,7 @@ index 829e5f4..08d6b75 100755
 +                                        ('HAVE_CBLAS', None)]}
          f2py_options = None
          pre_build_hook = None
-
+ 
 diff --git a/scipy/sparse/tests/test_sparsetools.py b/scipy/sparse/tests/test_sparsetools.py
 index 0c208ef..fd80e0b 100755
 --- a/scipy/sparse/tests/test_sparsetools.py
@@ -315,7 +752,7 @@ index 0c208ef..fd80e0b 100755
  import gc
 -import threading
 +import dummy_threading as threading
-
+ 
  import numpy as np
  from numpy.testing import assert_equal, assert_, assert_allclose
 diff --git a/scipy/spatial/ckdtree.pyx b/scipy/spatial/ckdtree.pyx
@@ -323,28 +760,28 @@ index d564c8e..0e06a8f 100755
 --- a/scipy/spatial/ckdtree.pyx
 +++ b/scipy/spatial/ckdtree.pyx
 @@ -19,13 +19,12 @@ from libcpp.algorithm cimport sort
-
+ 
  cimport cython
-
+ 
 -from multiprocessing import cpu_count
 -import threading
 +import dummy_threading as threading
-
+ 
  cdef extern from "<limits.h>":
      long LONG_MAX
-
+ 
 -cdef int number_of_processors = cpu_count()
 +cdef int number_of_processors = 1
-
+ 
  __all__ = ['cKDTree']
-
+ 
 @@ -158,7 +157,7 @@ cdef extern from "ordered_pair.h":
  # coo_entry wrapper
  # =================
-
+ 
 -cdef class coo_entries:
 +cdef class coo_entries(object):
-
+ 
      cdef:
          readonly object __array_interface__
 diff --git a/scipy/spatial/qhull.pyx b/scipy/spatial/qhull.pyx
@@ -354,7 +791,7 @@ index 7b46afd..dea910d 100755
 @@ -10,7 +10,7 @@ Wrappers for Qhull triangulation, plus some additional N-D geometry utilities
  # Distributed under the same BSD license as Scipy.
  #
-
+ 
 -import threading
 +import dummy_threading as threading
  import numpy as np
@@ -378,19 +815,41 @@ index f898f36..2675dcd 100755
 +++ b/scipy/special/_ellip_harm.py
 @@ -1,9 +1,13 @@
  import numpy as np
-
+ 
  from ._ufuncs import _ellip_harm
 -from ._ellip_harm_2 import _ellipsoid, _ellipsoid_norm
 +def _raise_error(*cargs, **kwargs):
 +    raise NotImplementedError
-
-
+ 
+ 
 +_ellipsoid = _raise_error
 +_ellipsoid_norm = _raise_error
 +
  def ellip_harm(h2, k2, n, p, s, signm=1, signn=1):
      r"""
      Ellipsoidal harmonic functions E^p_n(l)
+diff --git a/scipy/special/_round.h b/scipy/special/_round.h
+index 013a256..dfda277 100755
+--- a/scipy/special/_round.h
++++ b/scipy/special/_round.h
+@@ -54,15 +54,8 @@ double add_round_down(double a, double b)
+ #include <fenv.h>
+ #else
+ 
+-int fesetround(int round)
+-{
+-    return -1;
+-}
+-
+-int fegetround()
+-{
+-    return -1;
+-}
++int fesetround(int round);
++int fegetround();
+ 
+ #define FE_UPWARD -1
+ #define FE_DOWNWARD -1
 diff --git a/scipy/special/setup.py b/scipy/special/setup.py
 index 81eb09f..f93b31a 100755
 --- a/scipy/special/setup.py
@@ -398,7 +857,7 @@ index 81eb09f..f93b31a 100755
 @@ -98,11 +98,11 @@ def configuration(parent_package='',top_path=None):
                           define_macros=define_macros,
                           extra_info=get_info("npymath"))
-
+ 
 -    cfg = dict(get_system_info('lapack_opt'))
 -    config.add_extension('_ellip_harm_2',
 -                         sources=['_ellip_harm_2.c', 'sf_error.c',],
@@ -409,7 +868,7 @@ index 81eb09f..f93b31a 100755
 +    #                     sources=['_ellip_harm_2.c', 'sf_error.c',],
 +    #                     **cfg
 +    #                     )
-
+ 
      # Cython API
      config.add_data_files('cython_special.pxd')
 diff --git a/scipy/stats/kde.py b/scipy/stats/kde.py
@@ -418,7 +877,7 @@ index ed082e3..91e52cb 100755
 +++ b/scipy/stats/kde.py
 @@ -31,7 +31,11 @@ from numpy import (asarray, atleast_2d, reshape, zeros, newaxis, dot, exp, pi,
  import numpy as np
-
+ 
  # Local imports.
 -from . import mvn
 +try:
@@ -427,15 +886,15 @@ index ed082e3..91e52cb 100755
 +    mvn = None
 +
  from ._stats import gaussian_kernel_estimate
-
-
+ 
+ 
 diff --git a/scipy/stats/setup.py b/scipy/stats/setup.py
 index 94dc721..abbb1f0 100755
 --- a/scipy/stats/setup.py
 +++ b/scipy/stats/setup.py
 @@ -24,9 +24,9 @@ def configuration(parent_package='',top_path=None):
      )
-
+ 
      # add mvn module
 -    config.add_extension('mvn',
 -        sources=['mvn.pyf','mvndst.f'],
@@ -443,6 +902,26 @@ index 94dc721..abbb1f0 100755
 +    #config.add_extension('mvn',
 +    #    sources=['mvn.pyf','mvndst.f'],
 +    #)
-
+ 
      return config
-
+ 
+diff --git a/setup.py b/setup.py
+index c21d642..7a6dea9 100755
+--- a/setup.py
++++ b/setup.py
+@@ -467,7 +467,14 @@ def configuration(parent_package='', top_path=None):
+     from scipy._build_utils.system_info import get_info, NotFoundError
+     from numpy.distutils.misc_util import Configuration
+ 
+-    lapack_opt = get_info('lapack_opt')
++    #lapack_opt = get_info('lapack_opt')
++    lapack_opt = {  # libraries will be auto-generated by pywasmcross
++        'libraries': [],
++        'include_dirs': [],
++        'library_dirs': ['../../../../CLAPACK/CLAPACK-WA/'],
++        'language': 'f77',
++        'define_macros': [('NO_ATLAS_INFO', 1),
++            ('HAVE_CBLAS', None)]}
+ 
+     if not lapack_opt:
+         msg = 'No lapack/blas resources found.'
