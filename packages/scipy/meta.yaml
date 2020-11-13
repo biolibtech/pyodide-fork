@@ -8,8 +8,8 @@ source:
   # This requires,
   #    pip install Cython Tempita
   # on the host for the build
-  url: https://files.pythonhosted.org/packages/53/10/776750d57ade26522478a92a2e14035868624a6a62f4157b0cc5abd4a980/scipy-1.5.2.tar.gz
-  sha256: 066c513d90eb3fd7567a9e150828d39111ebd88d3e924cdfc9f8ce19ab6f90c9
+  url: https://github.com/scipy/scipy/archive/v1.5.2.tar.gz
+  sha256: f2c055e286a9421135407d3cb3efd3f1f7ae9a465b5edc0be14ac8c5c63f6ea1
 
   patches:
     # these patches can be found as commits in
@@ -18,7 +18,7 @@ source:
     - patches/patch_all.patch
 
 build:
-  cflags: -I../../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ERROR_ON_MISSING_LIBRARIES=0
+  cflags: -I../../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration
   cxxflags:
 
 requirements:
