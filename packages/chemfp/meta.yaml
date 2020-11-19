@@ -1,0 +1,8 @@
+package:
+  name: chemfp
+  version: 3.4.1
+
+source:
+  path: '/home/ubuntu/chemfp-3.4.1'
+
+  
