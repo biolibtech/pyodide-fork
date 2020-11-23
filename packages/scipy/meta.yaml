@@ -18,7 +18,7 @@ source:
     - patches/patch_all.patch
 
 build:
-  cflags: -I../../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration
+  cflags: -I../../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ERROR_ON_MISSING_LIBRARIES=0
   cxxflags:
 
 requirements:
@@ -40,3 +40,5 @@ test:
     - scipy.ndimage
     - scipy.spatial
     - scipy.special
+
+  
