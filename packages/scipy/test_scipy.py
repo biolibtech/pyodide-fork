@@ -11,7 +11,31 @@ def test_scipy_import(selenium_standalone, request):
     selenium.load_package("scipy")
     cmd = dedent(r"""
         import numpy as np
-        import scipy as sp
+        from scipy import signal
+        from scipy import misc
+        ascent = misc.ascent()
+        scharr = np.array([[ -3-3j, 0-10j,  +3 -3j],
+                        [-10+0j, 0+ 0j, +10 +0j],
+                        [ -3+3j, 0+10j,  +3 +3j]]) # Gx + j*Gy
+        grad = signal.convolve2d(ascent, scharr, boundary='symm', mode='same')
+        print(grad)
+    """)
+    selenium.run(cmd)
+
+def test_scipy_linregress(selenium_standalone, request):
+    selenium = selenium_standalone
+    if selenium.browser == 'chrome':
+        request.applymarker(pytest.mark.xfail(
+            run=False, reason='chrome not supported'))
+    selenium.load_package("scipy")
+    cmd = dedent(r"""
+        import numpy as np
+        import scipy.stats as sps
+        # np.random.seed(12345678)
+        # x = np.random.random(10)
+        # y = 1.6*x + np.random.random(10)
+        # slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+        # print("slope: %f    intercept: %f" % (slope, intercept))    
     """)
     selenium.run(cmd)
 

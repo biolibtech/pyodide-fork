@@ -16,6 +16,7 @@ source:
     #    https://github.com/rth/scipy/tree/0.17.1-pyodide
     # on top of the v0.17.1 tag
     - patches/patch_all.patch
+    - patches/throw_import_error_on_ode_fortran.patch
 
 build:
   cflags: -I../../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ERROR_ON_MISSING_LIBRARIES=0
