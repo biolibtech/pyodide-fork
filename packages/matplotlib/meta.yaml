@@ -1,18 +1,20 @@
 package:
   name: matplotlib
-  version: 2.2.3
+  version: 3.2.2
 
 source:
-  url: https://files.pythonhosted.org/packages/eb/a0/31b6ba00bc4dcbc06f0b80d1ad6119a9cc3081ecb04a00117f6c1ca3a084/matplotlib-2.2.3.tar.gz
-  sha256: 7355bf757ecacd5f0ac9dd9523c8e1a1103faadf8d33c22664178e17533f8ce5
+  url: https://github.com/matplotlib/matplotlib/archive/v3.2.2.tar.gz
+  sha256: dd4ff3e19f507a5a07612fa642e6e66fadbaf303483a43dc3acb04067f7ac522
 
   patches:
-    - patches/font_name_encoding.patch
-    - patches/force_malloc_free.patch
-    - patches/hardcoded_font_cache.patch
-    - patches/reduce_cpp_exceptions.patch
-    - patches/reduce-imports.patch
-    - patches/disable_macosx_backend.patch
+    - patches/fix_fonts.patch
+
+  #   - patches/font_name_encoding.patch
+  #   - patches/force_malloc_free.patch
+  #   - patches/hardcoded_font_cache.patch
+  #   - patches/reduce_cpp_exceptions.patch
+  #   - patches/reduce-imports.patch
+  #   - patches/disable_macosx_backend.patch
 
   extras:
     -
@@ -22,6 +24,7 @@ source:
       - src/setup.cfg
       - ./setup.cfg
 
+
 build:
   cflags: -s USE_FREETYPE=1 -s USE_LIBPNG=1 -s USE_ZLIB=1
   ldflags: ../../../../emsdk/emsdk/.emscripten_cache/asmjs/libpng.bc
@@ -30,7 +33,7 @@ build:
     rm -rf $SITEPACKAGES/matplotlib/backends/qt_editor
     rm -rf $SITEPACKAGES/matplotlib/backends/web_backend
     rm -rf $SITEPACKAGES/sphinxext
-    cp $PKGDIR/src/fontList.json $SITEPACKAGES/matplotlib
+    cp $PKGDIR/src/fontlist-v201.json $SITEPACKAGES/matplotlib
 
 requirements:
   run:
