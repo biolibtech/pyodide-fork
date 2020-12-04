@@ -1,8 +1,8 @@
 diff --git a/lib/matplotlib/font_manager.py b/lib/matplotlib/font_manager.py
-index db4a78b..0dfb2ec 100644
+index db4a78b..eda32a2 100644
 --- a/lib/matplotlib/font_manager.py
 +++ b/lib/matplotlib/font_manager.py
-@@ -267,11 +267,11 @@ def OSXInstalledFonts(directories=None, fontext='ttf'):
+@@ -267,21 +267,22 @@ def OSXInstalledFonts(directories=None, fontext='ttf'):
  def _call_fc_list():
      """Cache and list the font filenames known to `fc-list`.
      """
@@ -17,9 +17,16 @@ index db4a78b..0dfb2ec 100644
 +    #     'This may take a moment.'))
 +    # timer.start()
      try:
-         if b'--format' not in subprocess.check_output(['fc-list', '--help']):
-             _log.warning(  # fontconfig 2.7 implemented --format.
-@@ -281,7 +281,8 @@ def _call_fc_list():
+-        if b'--format' not in subprocess.check_output(['fc-list', '--help']):
+-            _log.warning(  # fontconfig 2.7 implemented --format.
+-                'Matplotlib needs fontconfig>=2.7 to query system fonts.')
+-            return []
+-        out = subprocess.check_output(['fc-list', '--format=%{file}\\n'])
++        # if b'--format' not in subprocess.check_output(['fc-list', '--help']):
++        #     _log.warning(  # fontconfig 2.7 implemented --format.
++        #         'Matplotlib needs fontconfig>=2.7 to query system fonts.')
++        #     return []
++        out = subprocess.run(['fc-list', '--format=%{file}\\n'], check=True, stdout=subprocess.PIPE).stdout
      except (OSError, subprocess.CalledProcessError):
          return []
      finally:
