@@ -1,8 +1,8 @@
 diff --git a/lib/matplotlib/font_manager.py b/lib/matplotlib/font_manager.py
-index db4a78b..eda32a2 100644
+index db4a78b..3c48aea 100644
 --- a/lib/matplotlib/font_manager.py
 +++ b/lib/matplotlib/font_manager.py
-@@ -267,21 +267,22 @@ def OSXInstalledFonts(directories=None, fontext='ttf'):
+@@ -267,21 +267,23 @@ def OSXInstalledFonts(directories=None, fontext='ttf'):
  def _call_fc_list():
      """Cache and list the font filenames known to `fc-list`.
      """
@@ -26,7 +26,8 @@ index db4a78b..eda32a2 100644
 +        #     _log.warning(  # fontconfig 2.7 implemented --format.
 +        #         'Matplotlib needs fontconfig>=2.7 to query system fonts.')
 +        #     return []
-+        out = subprocess.run(['fc-list', '--format=%{file}\\n'], check=True, stdout=subprocess.PIPE).stdout
++        #out = subprocess.run(['fc-list', '--format=%{file}\\n']).stdout
++        return []
      except (OSError, subprocess.CalledProcessError):
          return []
      finally:
@@ -36,7 +37,7 @@ index db4a78b..eda32a2 100644
      return [os.fsdecode(fname) for fname in out.split(b'\n')]
  
  
-@@ -955,7 +956,7 @@ class FontManager:
+@@ -955,7 +957,7 @@ class FontManager:
      # Increment this version number whenever the font cache data
      # format or behavior has changed and requires a existing font
      # cache files to be rebuilt.
@@ -45,7 +46,7 @@ index db4a78b..eda32a2 100644
  
      def __init__(self, size=None, weight='normal'):
          self._version = self.__version__
-@@ -1309,7 +1310,7 @@ def is_opentype_cff_font(filename):
+@@ -1309,7 +1311,7 @@ def is_opentype_cff_font(filename):
  
  
  _fmcache = os.path.join(
