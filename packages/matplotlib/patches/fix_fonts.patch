@@ -1,0 +1,57 @@
+diff --git a/lib/matplotlib/font_manager.py b/lib/matplotlib/font_manager.py
+index db4a78b..3c48aea 100644
+--- a/lib/matplotlib/font_manager.py
++++ b/lib/matplotlib/font_manager.py
+@@ -267,21 +267,23 @@ def OSXInstalledFonts(directories=None, fontext='ttf'):
+ def _call_fc_list():
+     """Cache and list the font filenames known to `fc-list`.
+     """
+-    # Delay the warning by 5s.
+-    timer = Timer(5, lambda: _log.warning(
+-        'Matplotlib is building the font cache using fc-list. '
+-        'This may take a moment.'))
+-    timer.start()
++    # # Delay the warning by 5s.
++    # timer = Timer(5, lambda: _log.warning(
++    #     'Matplotlib is building the font cache using fc-list. '
++    #     'This may take a moment.'))
++    # timer.start()
+     try:
+-        if b'--format' not in subprocess.check_output(['fc-list', '--help']):
+-            _log.warning(  # fontconfig 2.7 implemented --format.
+-                'Matplotlib needs fontconfig>=2.7 to query system fonts.')
+-            return []
+-        out = subprocess.check_output(['fc-list', '--format=%{file}\\n'])
++        # if b'--format' not in subprocess.check_output(['fc-list', '--help']):
++        #     _log.warning(  # fontconfig 2.7 implemented --format.
++        #         'Matplotlib needs fontconfig>=2.7 to query system fonts.')
++        #     return []
++        #out = subprocess.run(['fc-list', '--format=%{file}\\n']).stdout
++        return []
+     except (OSError, subprocess.CalledProcessError):
+         return []
+     finally:
+-        timer.cancel()
++        #timer.cancel()
++        pass
+     return [os.fsdecode(fname) for fname in out.split(b'\n')]
+ 
+ 
+@@ -955,7 +957,7 @@ class FontManager:
+     # Increment this version number whenever the font cache data
+     # format or behavior has changed and requires a existing font
+     # cache files to be rebuilt.
+-    __version__ = 310
++    __version__ = 201
+ 
+     def __init__(self, size=None, weight='normal'):
+         self._version = self.__version__
+@@ -1309,7 +1311,7 @@ def is_opentype_cff_font(filename):
+ 
+ 
+ _fmcache = os.path.join(
+-    mpl.get_cachedir(), 'fontlist-v{}.json'.format(FontManager.__version__))
++    os.path.dirname(__file__), 'fontlist-v{}.json'.format(FontManager.__version__))
+ fontManager = None
+ 
+ 
