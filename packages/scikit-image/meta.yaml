@@ -12,6 +12,9 @@ requirements:
     - scipy
     - joblib
     - pandas
+    - PyWavelets
+    - Pillow
+    - tifffile
     - matplotlib
 test:
   imports:

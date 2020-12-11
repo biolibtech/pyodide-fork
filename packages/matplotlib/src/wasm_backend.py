@@ -285,8 +285,11 @@ class FigureCanvasWasm(backend_agg.FigureCanvasAgg):
     }
 
     def set_cursor(self, cursor):
-        self.get_element('rubberband').style.cursor = \
-            self._cursor_map.get(cursor, 0)
+        # for elem in document.getElementsByTagName("*"):
+        #     print(f'Elem: {elem.id}')
+        # self.get_element('rubberband').style.cursor = \
+        #     self._cursor_map.get(cursor, 0)
+        pass
 
     # http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
     _SHIFT_LUT = {

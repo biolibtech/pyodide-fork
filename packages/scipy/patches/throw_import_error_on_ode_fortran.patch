@@ -1,0 +1,577 @@
+diff --git a/scipy/integrate/_ode.py b/scipy/integrate/_ode.py
+index 3094650..061b23d 100644
+--- a/scipy/integrate/_ode.py
++++ b/scipy/integrate/_ode.py
+@@ -87,14 +87,14 @@ import warnings
+ 
+ from numpy import asarray, array, zeros, isscalar, real, imag, vstack
+ 
+-from . import vode as _vode
+-from . import _dop
+-from . import lsoda as _lsoda
++# from . import vode as _vode
++# from . import _dop
++# from . import lsoda as _lsoda
+ 
+ 
+-_dop_int_dtype = _dop.types.intvar.dtype
+-_vode_int_dtype = _vode.types.intvar.dtype
+-_lsoda_int_dtype = _lsoda.types.intvar.dtype
++# _dop_int_dtype = _dop.types.intvar.dtype
++# _vode_int_dtype = _vode.types.intvar.dtype
++# _lsoda_int_dtype = _lsoda.types.intvar.dtype
+ 
+ 
+ # ------------------------------------------------------------------------------
+@@ -360,7 +360,7 @@ class ode(object):
+         return self._y
+ 
+     def set_initial_value(self, y, t=0.0):
+-        """Set initial conditions y(t) = y."""
++        """Set initial conditions y(t) = y.
+         if isscalar(y):
+             y = [y]
+         n_prev = len(self._y)
+@@ -370,6 +370,8 @@ class ode(object):
+         self.t = t
+         self._integrator.reset(len(self._y), self.jac is not None)
+         return self
++        """
++        raise ImportError("Biolib has temporarily disabled this function.")
+ 
+     def set_integrator(self, name, **integrator_params):
+         """
+@@ -381,7 +383,7 @@ class ode(object):
+             Name of the integrator.
+         integrator_params
+             Additional parameters for the integrator.
+-        """
++        
+         integrator = find_integrator(name)
+         if integrator is None:
+             # FIXME: this really should be raise an exception. Will that break
+@@ -395,6 +397,8 @@ class ode(object):
+                 self._y = array([0.0], self._integrator.scalar)
+             self._integrator.reset(len(self._y), self.jac is not None)
+         return self
++        """
++        return ImportError("Biolib has temporarily disabled this function")
+ 
+     def integrate(self, t, step=False, relax=False):
+         """Find y=y(t), set y as an initial condition, and return y.
+@@ -421,7 +425,6 @@ class ode(object):
+         -------
+         y : float
+             The integrated value at t
+-        """
+         if step and self._integrator.supports_step:
+             mth = self._integrator.step
+         elif relax and self._integrator.supports_run_relax:
+@@ -438,14 +441,20 @@ class ode(object):
+             raise ValueError('Function to integrate must not return a tuple.')
+ 
+         return self._y
++        """
++        raise ImportError("Biolib has temporarily disabled this function.")
++
+ 
+     def successful(self):
+-        """Check if integration was successful."""
++        """Check if integration was successful.
+         try:
+             self._integrator
+         except AttributeError:
+             self.set_integrator('')
+         return self._integrator.success == 1
++        """
++        raise ImportError("Biolib has temporarily disabled this function.")
++
+ 
+     def get_return_code(self):
+         """Extracts the return code for the integration to enable better control
+@@ -531,12 +540,12 @@ class ode(object):
+         -6           Error weight became zero during problem.
+         -7           Internal workspace insufficient to finish (internal error).
+         ===========  =======
+-        """
+         try:
+             self._integrator
+         except AttributeError:
+             self.set_integrator('')
+         return self._integrator.istate
++        """
+ 
+     def set_f_params(self, *args):
+         """Set extra parameters for user-supplied function f."""
+@@ -561,7 +570,6 @@ class ode(object):
+             solout should return -1 to stop integration
+             otherwise it should return None or 0
+ 
+-        """
+         if self._integrator.supports_solout:
+             self._integrator.set_solout(solout)
+             if self._y is not None:
+@@ -569,6 +577,9 @@ class ode(object):
+         else:
+             raise ValueError("selected integrator does not support solout,"
+                              " choose another one")
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ def _transform_banded_jac(bjac):
+@@ -582,12 +593,14 @@ def _transform_banded_jac(bjac):
+                          [I 0 K 0]
+ 
+     That is, every other column is shifted up one.
+-    """
+     # Shift every other column.
+     newjac = zeros((bjac.shape[0] + 1, bjac.shape[1]))
+     newjac[1:, ::2] = bjac[:, ::2]
+     newjac[:-1, 1::2] = bjac[:, 1::2]
+     return newjac
++    """
++    return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ class complex_ode(ode):
+@@ -620,22 +633,30 @@ class complex_ode(ode):
+     """
+ 
+     def __init__(self, f, jac=None):
++        """
+         self.cf = f
+         self.cjac = jac
+         if jac is None:
+             ode.__init__(self, self._wrap, None)
+         else:
+             ode.__init__(self, self._wrap, self._wrap_jac)
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def _wrap(self, t, y, *f_args):
++        """
+         f = self.cf(*((t, y[::2] + 1j * y[1::2]) + f_args))
+         # self.tmp is a real-valued array containing the interleaved
+         # real and imaginary parts of f.
+         self.tmp[::2] = real(f)
+         self.tmp[1::2] = imag(f)
+         return self.tmp
++        """
++        return ImportError("Biolib has temporarily disabled this function")
+ 
+     def _wrap_jac(self, t, y, *jac_args):
++        """
+         # jac is the complex Jacobian computed by the user-defined function.
+         jac = self.cjac(*((t, y[::2] + 1j * y[1::2]) + jac_args))
+ 
+@@ -657,6 +678,8 @@ class complex_ode(ode):
+             jac_tmp = _transform_banded_jac(jac_tmp)
+ 
+         return jac_tmp
++        """
++        return ImportError("Biolib has temporarily disabled this function")
+ 
+     @property
+     def y(self):
+@@ -672,7 +695,6 @@ class complex_ode(ode):
+             Name of the integrator
+         integrator_params
+             Additional parameters for the integrator.
+-        """
+         if name == 'zvode':
+             raise ValueError("zvode must be used with ode, not complex_ode")
+ 
+@@ -687,14 +709,20 @@ class complex_ode(ode):
+             integrator_params['uband'] = 2 * (uband or 0) + 1
+ 
+         return ode.set_integrator(self, name, **integrator_params)
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def set_initial_value(self, y, t=0.0):
+-        """Set initial conditions y(t) = y."""
++        """Set initial conditions y(t) = y.
+         y = asarray(y)
+         self.tmp = zeros(y.size * 2, 'float')
+         self.tmp[::2] = real(y)
+         self.tmp[1::2] = imag(y)
+         return ode.set_initial_value(self, self.tmp, t)
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def integrate(self, t, step=False, relax=False):
+         """Find y=y(t), set y as an initial condition, and return y.
+@@ -721,9 +749,12 @@ class complex_ode(ode):
+         -------
+         y : float
+             The integrated value at t
+-        """
+         y = ode.integrate(self, t, step, relax)
+         return y[::2] + 1j * y[1::2]
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
++
+ 
+     def set_solout(self, solout):
+         """
+@@ -738,12 +769,14 @@ class complex_ode(ode):
+             solout should return -1 to stop integration
+             otherwise it should return None or 0
+ 
+-        """
+         if self._integrator.supports_solout:
+             self._integrator.set_solout(solout, complex=True)
+         else:
+             raise TypeError("selected integrator does not support solouta,"
+                             + "choose another one")
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ # ------------------------------------------------------------------------------
+@@ -751,10 +784,14 @@ class complex_ode(ode):
+ # ------------------------------------------------------------------------------
+ 
+ def find_integrator(name):
++    """
+     for cl in IntegratorBase.integrator_classes:
+         if re.match(name, cl.__name__, re.I):
+             return cl
+     return None
++    """
++    return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ class IntegratorConcurrencyError(RuntimeError):
+@@ -835,7 +872,7 @@ def _vode_banded_jac_wrapper(jacfunc, ml, jac_params):
+ 
+ 
+ class vode(IntegratorBase):
+-    runner = getattr(_vode, 'dvode', None)
++    """runner = getattr(_vode, 'dvode', None)"""
+ 
+     messages = {-1: 'Excess work done on this call. (Perhaps wrong MF.)',
+                 -2: 'Excess accuracy requested. (Tolerances too small.)',
+@@ -910,7 +947,6 @@ class vode(IntegratorBase):
+ 
+         Side effects: If either self.mu or self.ml is not None and the other is None,
+         then the one that is None is set to 0.
+-        """
+ 
+         jac_is_banded = self.mu is not None or self.ml is not None
+         if jac_is_banded:
+@@ -940,8 +976,12 @@ class vode(IntegratorBase):
+ 
+         mf = 10 * self.meth + miter
+         return mf
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def reset(self, n, has_jac):
++        """
+         mf = self._determine_mf_and_set_bands(has_jac)
+ 
+         if mf == 10:
+@@ -988,8 +1028,12 @@ class vode(IntegratorBase):
+                           self.rwork, self.iwork, mf]
+         self.success = 1
+         self.initialized = False
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def run(self, f, jac, y0, t0, t1, f_params, jac_params):
++        """
+         if self.initialized:
+             self.check_handle()
+         else:
+@@ -1015,20 +1059,30 @@ class vode(IntegratorBase):
+             self.call_args[3] = 2  # upgrade istate from 1 to 2
+             self.istate = 2
+         return y1, t
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def step(self, *args):
++        """
+         itask = self.call_args[2]
+         self.call_args[2] = 2
+         r = self.run(*args)
+         self.call_args[2] = itask
+         return r
++        """
++        return ImportError("Biolib has temporarily disabled this function")
+ 
+     def run_relax(self, *args):
++        """
+         itask = self.call_args[2]
+         self.call_args[2] = 3
+         r = self.run(*args)
+         self.call_args[2] = itask
+         return r
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ if vode.runner is not None:
+@@ -1036,14 +1090,16 @@ if vode.runner is not None:
+ 
+ 
+ class zvode(vode):
++    """
+     runner = getattr(_vode, 'zvode', None)
+-
++    """
+     supports_run_relax = 1
+     supports_step = 1
+     scalar = complex
+     active_global_handle = 0
+ 
+     def reset(self, n, has_jac):
++        """
+         mf = self._determine_mf_and_set_bands(has_jac)
+ 
+         if mf in (10,):
+@@ -1101,6 +1157,9 @@ class zvode(vode):
+                           self.zwork, self.rwork, self.iwork, mf]
+         self.success = 1
+         self.initialized = False
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ if zvode.runner is not None:
+@@ -1108,7 +1167,9 @@ if zvode.runner is not None:
+ 
+ 
+ class dopri5(IntegratorBase):
++    """
+     runner = getattr(_dop, 'dopri5', None)
++    """
+     name = 'dopri5'
+     supports_solout = True
+ 
+@@ -1154,6 +1215,7 @@ class dopri5(IntegratorBase):
+             self.iout = 1
+ 
+     def reset(self, n, has_jac):
++        """
+         work = zeros((8 * n + 21,), float)
+         work[1] = self.safety
+         work[2] = self.dfactor
+@@ -1169,8 +1231,12 @@ class dopri5(IntegratorBase):
+         self.call_args = [self.rtol, self.atol, self._solout,
+                           self.iout, self.work, self.iwork]
+         self.success = 1
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def run(self, f, jac, y0, t0, t1, f_params, jac_params):
++        """
+         x, y, iwork, istate = self.runner(*((f, t0, y0, t1) +
+                                           tuple(self.call_args) + (f_params,)))
+         self.istate = istate
+@@ -1180,6 +1246,9 @@ class dopri5(IntegratorBase):
+                           self.messages.get(istate, unexpected_istate_msg)))
+             self.success = 0
+         return y, x
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def _solout(self, nr, xold, x, y, nd, icomp, con):
+         if self.solout is not None:
+@@ -1195,7 +1264,9 @@ if dopri5.runner is not None:
+ 
+ 
+ class dop853(dopri5):
++    """
+     runner = getattr(_dop, 'dop853', None)
++    """
+     name = 'dop853'
+ 
+     def __init__(self,
+@@ -1216,6 +1287,7 @@ class dop853(dopri5):
+                                              verbosity)
+ 
+     def reset(self, n, has_jac):
++        """
+         work = zeros((11 * n + 21,), float)
+         work[1] = self.safety
+         work[2] = self.dfactor
+@@ -1231,6 +1303,9 @@ class dop853(dopri5):
+         self.call_args = [self.rtol, self.atol, self._solout,
+                           self.iout, self.work, self.iwork]
+         self.success = 1
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ if dop853.runner is not None:
+@@ -1238,7 +1313,9 @@ if dop853.runner is not None:
+ 
+ 
+ class lsoda(IntegratorBase):
++    """
+     runner = getattr(_lsoda, 'lsoda', None)
++    """
+     active_global_handle = 0
+ 
+     messages = {
+@@ -1286,6 +1363,7 @@ class lsoda(IntegratorBase):
+         self.initialized = False
+ 
+     def reset(self, n, has_jac):
++        """
+         # Calculate parameters for Fortran subroutine dvode.
+         if has_jac:
+             if self.mu is None and self.ml is None:
+@@ -1334,8 +1412,12 @@ class lsoda(IntegratorBase):
+                           self.rwork, self.iwork, jt]
+         self.success = 1
+         self.initialized = False
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def run(self, f, jac, y0, t0, t1, f_params, jac_params):
++        """
+         if self.initialized:
+             self.check_handle()
+         else:
+@@ -1354,20 +1436,31 @@ class lsoda(IntegratorBase):
+             self.call_args[3] = 2  # upgrade istate from 1 to 2
+             self.istate = 2
+         return y1, t
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def step(self, *args):
++        """
+         itask = self.call_args[2]
+         self.call_args[2] = 2
+         r = self.run(*args)
+         self.call_args[2] = itask
+         return r
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+     def run_relax(self, *args):
++        """
+         itask = self.call_args[2]
+         self.call_args[2] = 3
+         r = self.run(*args)
+         self.call_args[2] = itask
+         return r
++        """
++        return ImportError("Biolib has temporarily disabled this function")
++
+ 
+ 
+ if lsoda.runner:
+diff --git a/scipy/signal/ltisys.py b/scipy/signal/ltisys.py
+index 77ddc01..5ab6a7d 100644
+--- a/scipy/signal/ltisys.py
++++ b/scipy/signal/ltisys.py
+@@ -25,7 +25,7 @@ import warnings
+ # use scipy's qr until this is solved
+ 
+ from scipy.linalg import qr as s_qr
+-from scipy import integrate, interpolate, linalg
++from scipy import interpolate, linalg
+ from scipy.interpolate import interp1d
+ from .filter_design import (tf2zpk, zpk2tf, normalize, freqs, freqz, freqs_zpk,
+                             freqz_zpk)
+@@ -1860,7 +1860,6 @@ def lsim2(system, U=None, T=None, X0=None, **kwargs):
+     >>> plt.xlabel('t')
+     >>> plt.show()
+ 
+-    """
+     if isinstance(system, lti):
+         sys = system._as_ss()
+     elif isinstance(system, dlti):
+@@ -1904,19 +1903,20 @@ def lsim2(system, U=None, T=None, X0=None, **kwargs):
+                                      axis=0, bounds_error=False)
+ 
+         def fprime(x, t, sys, ufunc):
+-            """The vector field of the linear system."""
++            #The vector field of the linear system.
+             return dot(sys.A, x) + squeeze(dot(sys.B, nan_to_num(ufunc([t]))))
+         xout = integrate.odeint(fprime, X0, T, args=(sys, ufunc), **kwargs)
+         yout = dot(sys.C, transpose(xout)) + dot(sys.D, transpose(U))
+     else:
+         def fprime(x, t, sys):
+-            """The vector field of the linear system."""
++            #The vector field of the linear system.#
+             return dot(sys.A, x)
+         xout = integrate.odeint(fprime, X0, T, args=(sys,), **kwargs)
+         yout = dot(sys.C, transpose(xout))
+ 
+     return T, squeeze(transpose(yout)), xout
+-
++"""
++    pass
+ 
+ def _cast_to_array_dtype(in1, in2):
+     """Cast array to dtype of other array, while avoiding ComplexWarning.
+diff --git a/scipy/stats/_continuous_distns.py b/scipy/stats/_continuous_distns.py
+index f3ab7d2..be9fba5 100644
+--- a/scipy/stats/_continuous_distns.py
++++ b/scipy/stats/_continuous_distns.py
+@@ -5,7 +5,7 @@
+ #
+ import warnings
+ from collections.abc import Iterable
+-import ctypes
++#import ctypes
+ 
+ import numpy as np
+ 
+@@ -3684,11 +3684,14 @@ class geninvgauss_gen(rv_continuous):
+ 
+         @np.vectorize
+         def _cdf_single(x, *args):
++            """
+             p, b = args
+             user_data = np.array([p, b], float).ctypes.data_as(ctypes.c_void_p)
+             llc = LowLevelCallable.from_cython(_stats, '_geninvgauss_pdf', user_data)
+ 
+             return integrate.quad(llc, _a, x)[0]
++            """
++            return ImportError("Biolib has temporarily disabled this function")
+ 
+         return _cdf_single(x, *args)
+ 
+diff --git a/scipy/stats/_multivariate.py b/scipy/stats/_multivariate.py
+index bb17de9..c5429f5 100644
+--- a/scipy/stats/_multivariate.py
++++ b/scipy/stats/_multivariate.py
+@@ -13,7 +13,10 @@ from scipy.linalg.misc import LinAlgError
+ from scipy.linalg.lapack import get_lapack_funcs
+ 
+ from ._discrete_distns import binom
+-from . import mvn
++try:
++    from . import mvn
++except ImportError:
++    mvn = None
+ 
+ __all__ = ['multivariate_normal',
+            'matrix_normal',
