@@ -228,7 +228,10 @@ def handle_command(line, args, dryrun=False):
         # distutils doesn't use the c++ compiler when compiling c++ <sigh>
         if any(arg.endswith('.cpp') for arg in line):
             new_args = ['em++']
-    library_output = line[-1].endswith('.so')
+    
+    library_output = None
+    if '-o' in line:
+        library_output = line[line.index('-o') + 1].endswith('.so')
 
     if library_output:
         new_args.extend(args.ldflags.split())

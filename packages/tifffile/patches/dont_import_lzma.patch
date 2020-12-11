@@ -1,0 +1,33 @@
+diff --git a/tifffile/tifffile.py b/tifffile/tifffile.py
+index b26db3b..34e9137 100644
+--- a/tifffile/tifffile.py
++++ b/tifffile/tifffile.py
+@@ -11312,7 +11312,11 @@ def unpack_rgb(data, dtype=None, bitspersample=None, rescale=True):
+ 
+ if imagecodecs is None:
+     import zlib
+-    import lzma
++
++    try:
++        import lzma
++    except Exception:
++        lzma = None
+ 
+     def zlib_encode(data, level=6, out=None):
+         """Compress Zlib DEFLATE."""
+@@ -11324,11 +11328,13 @@ if imagecodecs is None:
+ 
+     def lzma_encode(data, level=None, out=None):
+         """Compress LZMA."""
+-        return lzma.compress(data)
++        #return lzma.compress(data)
++        raise ImportError('BioLib does not support lzma yet')
+ 
+     def lzma_decode(data, out=None):
+         """Decompress LZMA."""
+-        return lzma.decompress(data)
++        #return lzma.decompress(data)
++        raise ImportError('BioLib does not support lzma yet')
+ 
+     def delta_encode(data, axis=-1, out=None):
+         """Encode Delta."""

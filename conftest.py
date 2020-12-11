@@ -274,7 +274,7 @@ class ChromeWrapper(SeleniumWrapper):
 
 
 if pytest is not None:
-    @pytest.fixture(params=['firefox', 'chrome'])
+    @pytest.fixture(params=['firefox'])
     def selenium_standalone(request, web_server_main):
         server_hostname, server_port, server_log = web_server_main
         if request.param == 'firefox':
@@ -288,10 +288,12 @@ if pytest is not None:
         try:
             yield selenium
         finally:
+            if 'Python initialization complete' in selenium.logs:
+                __tracebackhide__ = True
             print(selenium.logs)
             selenium.driver.quit()
 
-    @pytest.fixture(params=['firefox', 'chrome'], scope='module')
+    @pytest.fixture(params=['firefox'], scope='module')
     def _selenium_cached(request, web_server_main):
         # Cached selenium instance. This is a copy-paste of
         # selenium_standalone to avoid fixture scope issues
@@ -316,8 +318,10 @@ if pytest is not None:
             _selenium_cached.clean_logs()
             yield _selenium_cached
         finally:
+            if 'Python initialization complete' in selenium.logs:
+                __tracebackhide__ = True
+                
             print(_selenium_cached.logs)
-
 
 @pytest.fixture(scope='session')
 def web_server_main(request):
